@@ -1,3 +1,4 @@
+import base64
 import hashlib
 import re
 import json
@@ -21,7 +22,10 @@ from django.conf import settings
 from .models import TbBarang
 import csv
 import io
-import win32print
+try:
+    import win32print
+except ImportError:
+    win32print = None
 from collections import defaultdict
 from datetime import datetime, date
 from zoneinfo import ZoneInfo
@@ -7745,11 +7749,30 @@ def pengembalian_update_status(request):
 # =========================================================
 # CETAK STRUK THERMAL PRINTER RPP02N
 # =========================================================
-THERMAL_PRINTER_NAME = "RONGTA RPP02 Series Printer(2)"
+THERMAL_PRINTER_NAME = settings.THERMAL_PRINTER_NAME
 
 
 def _thermal_text(value):
-    return str(value or "").encode("cp850", errors="replace")
+    """
+    Encode teks ke bytes untuk printer thermal RONGTA.
+    Menggunakan cp437 (PC437/ASCII murni) — codepage default printer thermal.
+    Karakter di luar ASCII diganti dengan transliterasi aman.
+    """
+    text = str(value or "")
+    # Transliterasi huruf beraksent agar tetap terbaca dengan benar
+    replacements = {
+        "á": "a", "à": "a", "ä": "a", "â": "a", "ã": "a",
+        "é": "e", "è": "e", "ë": "e", "ê": "e",
+        "í": "i", "ì": "i", "ï": "i", "î": "i",
+        "ó": "o", "ò": "o", "ö": "o", "ô": "o", "õ": "o",
+        "ú": "u", "ù": "u", "ü": "u", "û": "u",
+        "ñ": "n", "ç": "c",
+        "\u2019": "'", "\u2018": "'", "\u201c": '"', "\u201d": '"',
+        "\u2013": "-", "\u2014": "-",
+    }
+    for src, dst in replacements.items():
+        text = text.replace(src, dst)
+    return text.encode("ascii", errors="replace")
 
 
 def _thermal_rupiah(value):
@@ -7796,6 +7819,8 @@ def _thermal_normal_size():
 
 
 def _thermal_raw_print(data: bytes):
+    if win32print is None:
+        raise NotImplementedError("Direct server-side printing is not supported on this platform/host.")
     hprinter = win32print.OpenPrinter(THERMAL_PRINTER_NAME)
 
     try:
@@ -7839,7 +7864,8 @@ def cetak_struk_transaksi(request, id_transaksi):
         data = b""
 
         # Reset printer
-        data += b"\x1b@"
+        data += b"\x1b@"           # ESC @ — inisialisasi ulang printer
+        data += b"\x1bt\x00"       # ESC t 0 — pilih codepage PC437 (ASCII default)
         data += _thermal_normal_size()
 
         # =========================
@@ -7989,15 +8015,16 @@ def cetak_struk_transaksi(request, id_transaksi):
         data += _thermal_align_left()
         data += _thermal_text("\n\n\n")
 
-        _thermal_raw_print(data)
-
+        # Kembalikan data ESC/POS sebagai base64 ke browser.
+        # Browser (JS) yang akan meneruskan ke local_print_server.exe di PC kasir.
+        # Ini bekerja baik di lokal maupun saat Django berjalan di VPS.
         return JsonResponse({
-            "status": "success",
-            "message": "Struk berhasil dicetak."
+            "status": "ok",
+            "escpos_b64": base64.b64encode(data).decode("ascii"),
         })
 
     except Exception as e:
         return JsonResponse({
             "status": "error",
             "message": str(e)
-        }, status=500)
+        }, status=500)

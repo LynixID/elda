@@ -142,5 +142,13 @@ MIDTRANS_SERVER_KEY = os.getenv("MIDTRANS_SERVER_KEY", "")
 # Printer
 THERMAL_PRINTER_NAME = os.getenv(
     "THERMAL_PRINTER_NAME",
-    "RONGTA RPP02 Series Printer(2)"
+    "RONGTA 80mm Series Printer"
+)
+
+# Local Print Server (dijalankan di PC kasir Windows)
+# Script: local_print_server.py
+# Isi di .env: LOCAL_PRINT_SERVER_URL=http://127.0.0.1:27631
+LOCAL_PRINT_SERVER_URL = os.getenv(
+    "LOCAL_PRINT_SERVER_URL",
+    "http://127.0.0.1:27631"
 )

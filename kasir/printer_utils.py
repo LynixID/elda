@@ -1,4 +1,7 @@
-import win32print
+try:
+    import win32print
+except ImportError:
+    win32print = None
 from django.conf import settings
 
 
@@ -28,8 +31,9 @@ def _left_right(left, right, width=32):
 
 
 def raw_print(data: bytes):
+    if win32print is None:
+        raise NotImplementedError("Direct server-side printing is not supported on this platform/host.")
     printer_name = settings.THERMAL_PRINTER_NAME
-
     hprinter = win32print.OpenPrinter(printer_name)
     try:
         job = win32print.StartDocPrinter(

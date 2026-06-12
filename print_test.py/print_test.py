@@ -6,7 +6,7 @@ print("Daftar printer:")
 for printer in printers:
     print("-", printer)
 
-PRINTER_NAME = "RONGTA RPP02 Series Printer(2)"
+PRINTER_NAME = "RONGTA 80mm Series Printer"
 
 data = (
     b"\x1b@"  # reset printer

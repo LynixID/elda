@@ -1145,7 +1145,10 @@
 
     function getReceiptPrintStyles(pageHeightMm) {
       return `
-        @page { size: 80mm ${pageHeightMm}mm; margin: 0; }
+        @page { 
+          size: 80mm auto; 
+          margin: 0 !important; 
+        }
         * { box-sizing: border-box; }
         html, body {
           margin: 0;
@@ -1153,15 +1156,19 @@
           width: 80mm !important;
           background: #ffffff;
           color: #000000;
-          font-family: "Courier New", Courier, monospace;
+          font-family: "Consolas", "Courier New", Courier, monospace;
+          font-weight: bold; /* Huruf tebal agar solid pada printer thermal */
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
-          overflow: hidden;
+          -webkit-font-smoothing: none;
+          -moz-osx-font-smoothing: none;
+          font-smoothing: none;
+          text-rendering: optimizeSpeed;
         }
         .print-root {
-          width: 80mm !important;
-          margin: 0 !important;
-          padding: 3mm 3mm 4mm !important;
+          width: 72mm !important; /* Lebar cetak aktif */
+          margin: 0 !important; /* Hilangkan margin auto agar rata dengan batas kiri hardware printer */
+          padding: 4mm 0 6mm !important; /* Padding atas-bawah, hilangkan padding kiri-kanan agar presisi */
           background: #ffffff;
         }
         .tx-receiptPaper {
@@ -1170,22 +1177,29 @@
           padding: 0;
           background: #ffffff;
           color: #000000;
-          font-size: 12px;
-          line-height: 1.38;
+          font-size: 14px; /* Naikkan sedikit ukuran huruf agar lebih jelas */
+          line-height: 1.35;
         }
-        .tx-r-top { text-align: center; margin-bottom: 4px; }
-        .tx-r-shop { text-align: center; font-size: 15px; font-weight: 700; line-height: 1.25; margin-bottom: 3px; word-break: break-word; }
-        .tx-r-meta { font-size: 11px; line-height: 1.35; word-break: break-word; }
-        .tx-r-line { text-align: center; font-size: 10px; margin: 7px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
-        .tx-r-item { margin: 7px 0; }
-        .tx-r-itemName { font-weight: 700; margin-bottom: 2px; word-break: break-word; }
-        .tx-r-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; width: 100%; font-size: 11px; }
+        .tx-r-top { text-align: center; margin-bottom: 6px; }
+        .tx-r-shop { text-align: center; font-size: 17px; font-weight: bold; line-height: 1.25; margin-bottom: 4px; word-break: break-word; }
+        .tx-r-meta { font-size: 13px; line-height: 1.35; word-break: break-word; }
+        .tx-r-line { 
+          border-top: 1.5px dashed #000000 !important; /* Garis pembatas putus-putus nyata dari CSS */
+          height: 0;
+          margin: 8px 0;
+          font-size: 0;
+          line-height: 0;
+          overflow: hidden;
+        }
+        .tx-r-item { margin: 6px 0; }
+        .tx-r-itemName { font-weight: bold; margin-bottom: 2px; word-break: break-word; }
+        .tx-r-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; width: 100%; font-size: 13px; }
         .tx-r-row span:first-child { flex: 1 1 auto; min-width: 0; word-break: break-word; }
         .tx-r-row span:last-child { flex: 0 0 auto; white-space: nowrap; text-align: right; }
         .tx-r-totalBox { margin-top: 8px; }
-        .tx-r-grand { font-weight: 700; font-size: 12px; }
-        .tx-r-note { text-align: center; margin-top: 10px; font-size: 10px; line-height: 1.35; word-break: break-word; }
-        .tx-r-footer, .tx-r-footerDate { text-align: center; margin-top: 8px; font-size: 10px; line-height: 1.3; }
+        .tx-r-grand { font-weight: bold; font-size: 14px; }
+        .tx-r-note { text-align: center; margin-top: 12px; font-size: 12px; line-height: 1.35; word-break: break-word; }
+        .tx-r-footer, .tx-r-footerDate { text-align: center; margin-top: 10px; font-size: 12px; line-height: 1.3; }
       `;
     }
 
@@ -1206,40 +1220,103 @@
       `;
     }
 
-    async function cetakStrukDjango(idTransaksi) {
-      const id = Number(
-        idTransaksi ||
-        lastSavedTransaksiId ||
-        lastReceiptData?.id_transaksi ||
-        0
-      );
+    // ─── Toast notifikasi print berhasil ───
+    let _toastTimer = null;
+    function showPrintToast(printerName) {
+      const toast = document.getElementById("tx-print-toast");
+      if (!toast) return;
+
+      // Update sub-label dengan nama printer
+      const sub = toast.querySelector(".tx-toast-sub");
+      if (sub && printerName) {
+        sub.textContent = `Dikirim ke: ${printerName}`;
+      } else if (sub) {
+        sub.textContent = "Struk dikirim ke printer";
+      }
+
+      // Tampilkan
+      toast.classList.add("tx-toast-show");
+
+      // Auto-hide setelah 2.8 detik
+      clearTimeout(_toastTimer);
+      _toastTimer = setTimeout(() => {
+        toast.classList.remove("tx-toast-show");
+      }, 2800);
+    }
+
+    const LOCAL_PRINT_SERVER = "http://localhost:27631";
+
+    /**
+     * Konversi string base64 ke Uint8Array (binary).
+     * Digunakan untuk mengirim data ESC/POS mentah ke local print server.
+     */
+    function _b64ToBytes(b64) {
+      const bin = atob(b64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return bytes;
+    }
+
+    async function printReceiptNow() {
+      const id = Number(lastSavedTransaksiId || lastReceiptData?.id_transaksi || 0);
 
       if (!id) {
-        alert("Transaksi belum tersimpan. Klik Simpan/Cetak dulu sampai transaksi tersimpan.");
+        alert("Transaksi belum tersimpan. Simpan transaksi dulu sebelum mencetak.");
         return;
       }
 
-      try {
-        if (btnPrintNow) {
-          btnPrintNow.disabled = true;
-          btnPrintNow.textContent = "Mencetak...";
-        }
+      if (btnPrintNow) {
+        btnPrintNow.disabled = true;
+        btnPrintNow.textContent = "Mencetak...";
+      }
 
+      try {
+        // ── Langkah 1: Minta ESC/POS data dari Django (VPS atau lokal) ──
         const res = await fetch(`/transaksi/${id}/cetak/`, {
           method: "GET",
-          headers: {
-            "X-Requested-With": "XMLHttpRequest",
-          },
+          headers: { "X-Requested-With": "XMLHttpRequest" },
           credentials: "same-origin",
         });
 
         const data = await readJsonSafe(res);
 
-        if (!res.ok || data.status !== "success") {
-          throw new Error(data.message || data.msg || "Gagal mencetak struk.");
+        if (!res.ok || data.status !== "ok") {
+          throw new Error(data.message || data.msg || "Gagal mengambil data struk dari server.");
         }
 
-        alert(data.message || "Struk berhasil dicetak.");
+        const escposBytes = _b64ToBytes(data.escpos_b64);
+
+        // ── Langkah 2: Browser kirim ESC/POS langsung ke PC kasir ──
+        // localhost:27631 selalu merujuk ke PC yang sedang membuka browser ini,
+        // tidak peduli Django-nya di lokal atau VPS.
+        let printRes;
+        try {
+          printRes = await fetch(`${LOCAL_PRINT_SERVER}/print`, {
+            method: "POST",
+            headers: { "Content-Type": "application/octet-stream" },
+            body: escposBytes,
+          });
+        } catch (netErr) {
+          // Local print server tidak berjalan
+          const pakai = confirm(
+            "Local Print Server tidak aktif di PC ini.\n\n" +
+            "Jalankan 'PrintServer-HarmoniAgro.exe' (atau local_print_server.py) " +
+            "di PC kasir untuk cetak ESC/POS yang jernih.\n\n" +
+            "Ingin cetak via browser sebagai alternatif sementara?"
+          );
+          if (pakai) _printViaBrowser();
+          return;
+        }
+
+        const printData = await printRes.json().catch(() => ({}));
+
+        if (!printRes.ok || printData.status !== "success") {
+          throw new Error(printData.message || "Local print server gagal mencetak.");
+        }
+
+        // ── Sukses ── tampilkan toast dengan nama printer
+        showPrintToast(printData.printer || "");
+
       } catch (err) {
         console.error(err);
         alert("Gagal cetak struk: " + (err.message || err));
@@ -1251,9 +1328,27 @@
       }
     }
 
-    function printReceiptNow() {
-      cetakStrukDjango();
+    function _printViaBrowser() {
+      if (!receiptPaper) return;
+      const heightMm = getReceiptPageHeightMm();
+      const printHtml = buildReceiptPrintHtml(receiptPaper.innerHTML, heightMm);
+      let iframe = document.getElementById("tx-print-iframe");
+      if (!iframe) {
+        iframe = document.createElement("iframe");
+        iframe.id = "tx-print-iframe";
+        iframe.style.cssText = "position:fixed;bottom:0;right:0;width:0;height:0;border:none;";
+        document.body.appendChild(iframe);
+      }
+      const doc = iframe.contentWindow.document;
+      doc.open();
+      doc.write(printHtml);
+      doc.close();
+      setTimeout(() => {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      }, 250);
     }
+
 
     async function buatTokenMidtrans() {
       const total = calcTotalTransaksi();

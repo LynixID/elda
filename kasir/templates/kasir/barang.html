@@ -1,0 +1,394 @@
+{% load static %}
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Data Barang - Sistem Kasir Harmoni Agro</title>
+
+  <meta name="csrf-token" content="{{ csrf_token }}">
+
+  <link rel="stylesheet" href="{% static 'kasir/css/home.css' %}?v=2241">
+  <link rel="stylesheet" href="{% static 'kasir/css/barang.css' %}?v=2029full116">
+
+  <script>
+    window.TX_BARANG_PAGE_URL = "{% url 'kasir:barang' %}";
+    window.TX_BARANG_JSON_URL = "{% url 'kasir:barang_json' %}";
+    window.TX_BARANG_IMPORT_URL = "{% url 'kasir:barang_import' %}";
+    window.TX_BARANG_EXPORT_URL = "{% url 'kasir:barang_export' %}";
+    window.TX_BARANG_EDIT_URL = "{% url 'kasir:barang_edit' %}";
+    window.TX_BARANG_DELETE_URL = "{% url 'kasir:barang_delete' %}";
+    window.TX_BARANG_CREATE_URL = "{% url 'kasir:barang_create' %}";
+    window.TX_BARANG_DELETE_ALL_URL = "{% url 'kasir:barang_delete_all' %}";
+    window.TX_SUPPLIER_JSON_URL = "{% url 'kasir:supplier_json' %}";
+
+    window.TX_KATEGORI_PAGE_URL = "{% url 'kasir:kategori' %}";
+    window.TX_KATEGORI_JSON_URL = "{% url 'kasir:kategori_json' %}";
+  </script>
+
+  <script src="{% static 'kasir/js/home.js' %}?v=2241" defer></script>
+  <script src="{% static 'kasir/js/barang.js' %}?v=2026full12" defer></script>
+</head>
+
+<body
+  class="home-page navbar-mode barang-page-body barang-nav-collapsed"
+  data-role="{{ role|default:'' }}"
+  data-nama-kasir="{{ nama|default:username|default:'' }}"
+>
+  <div class="app-shell">
+
+    <header class="main-navbar">
+      <div class="navbar-top">
+        <div class="nav-brand-wrap">
+          <a href="{% url 'kasir:home' %}" class="nav-brand">
+            <img
+              src="{% static 'kasir/img/logo_pertanian.png' %}"
+              alt="Toko Pertanian Harmoni Agro"
+              class="nav-brand-logo"
+            >
+
+            <div class="nav-brand-copy">
+              <span class="nav-brand-kicker">Sistem Kasir</span>
+              <span class="nav-brand-text">Harmoni Agro</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="navbar-bottom">
+        <nav class="nav-menu" aria-label="Menu utama">
+          <a class="nav-link" href="{% url 'kasir:home' %}">
+            Beranda
+          </a>
+
+          <div class="nav-dropdown">
+            <button type="button" class="nav-link nav-toggle" aria-expanded="false">
+              <span>Transaksi</span>
+              <span class="nav-caret" aria-hidden="true"></span>
+            </button>
+
+            <div class="nav-dropdown-menu nav-dropdown-menu-rich">
+              <a href="{% url 'kasir:transaksi' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+                <span class="nav-item-icon" aria-hidden="true">🧾</span>
+                <span class="nav-item-copy">
+                  <span class="nav-item-title">Penjualan</span>
+                  <span class="nav-item-desc">Input transaksi penjualan</span>
+                </span>
+              </a>
+
+              {% if role == "pemilik" %}
+                <a href="{% url 'kasir:pembelian' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+                  <span class="nav-item-icon" aria-hidden="true">📦</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Pembelian</span>
+                    <span class="nav-item-desc">Kelola transaksi pembelian stok</span>
+                  </span>
+                </a>
+
+                <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:retur' %}">
+                  <span class="nav-item-icon">↩️</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Retur Pembelian</span>
+                    <span class="nav-item-desc">Barang rusak / tidak sesuai</span>
+                  </span>
+                </a>
+
+                <a class="nav-dropdown-item nav-dropdown-item-rich active" href="{% url 'kasir:pengembalian' %}">
+                  <span class="nav-item-icon" aria-hidden="true">📑</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Riwayat Pengembalian</span>
+                    <span class="nav-item-desc">Hasil retur dari supplier</span>
+                  </span>
+                </a>
+              {% endif %}
+            </div>
+          </div>
+
+          {% if role == "pemilik" %}
+            <div class="nav-dropdown">
+              <button type="button" class="nav-link nav-toggle active" aria-expanded="false">
+                <span>Master Data</span>
+                <span class="nav-caret" aria-hidden="true"></span>
+              </button>
+
+              <div class="nav-dropdown-menu nav-dropdown-menu-rich">
+                <a href="{% url 'kasir:barang' %}" class="nav-dropdown-item nav-dropdown-item-rich active">
+                  <span class="nav-item-icon" aria-hidden="true">📋</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Data Barang</span>
+                    <span class="nav-item-desc">Kelola data barang di gudang</span>
+                  </span>
+                </a>
+
+                <a href="{% url 'kasir:kategori' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+                  <span class="nav-item-icon" aria-hidden="true">🏷️</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Data Kategori</span>
+                    <span class="nav-item-desc">Kelola kategori barang</span>
+                  </span>
+                </a>
+
+                <a href="{% url 'kasir:pembelian' %}#supplier" class="nav-dropdown-item nav-dropdown-item-rich">
+                  <span class="nav-item-icon" aria-hidden="true">🤝</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Data Supplier</span>
+                    <span class="nav-item-desc">Kelola data supplier pembelian</span>
+                  </span>
+                </a>
+              </div>
+            </div>
+          {% endif %}
+
+          <a class="nav-link" href="{% url 'kasir:riwayat' %}">
+            Riwayat
+          </a>
+
+          {% if role == "pemilik" %}
+            <a class="nav-link" href="{% url 'kasir:pendapatan' %}">
+              Pendapatan
+            </a>
+
+            <a class="nav-link" href="{% url 'kasir:rekomendasi' %}">
+              Rekomendasi
+            </a>
+          {% endif %}
+        </nav>
+
+        <div class="barang-nav-tools">
+          <button
+            id="barangNavToggle"
+            class="barang-nav-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-label="Tampilkan atau sembunyikan topbar atas"
+          >
+            Tampilkan Atas
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content-area barang-page">
+      <section class="content barang-content">
+
+        <div class="barang-page-card" role="region" aria-label="Data Barang">
+          <div class="barang-page-body">
+
+            <div class="barang-toolbar">
+              <input
+                id="barangSearch"
+                type="text"
+                placeholder="Cari kode / nama / satuan..."
+                autocomplete="off"
+              >
+
+              {% if role == "pemilik" %}
+                <div class="barang-actions">
+                  <button id="barangExport" class="btn" type="button">
+                    Export Excel
+                  </button>
+
+                  <button id="barangImportBtn" class="btn ghost" type="button">
+                    Import Excel
+                  </button>
+
+                  <input id="barangImportFile" type="file" accept=".csv,.xlsx" hidden>
+
+                  <button id="barangTambah" class="btn btn-add" type="button">
+                    Tambah Barang
+                  </button>
+
+                  <button id="barangDeleteAll" class="btn btn-danger-soft" type="button">
+                    Hapus Semua
+                  </button>
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="tab-row" id="barangTabs"></div>
+
+            <div class="table-wrap">
+              <table class="table" id="barangTable">
+                <thead>
+                  <tr>
+                    <th>Kode Barang</th>
+                    <th>Kategori</th>
+                    <th>Supplier</th>
+                    <th>Nama Barang</th>
+                    <th>Satuan</th>
+                    <th>Stok Saat Ini</th>
+                    <th>Stok Minimal</th>
+
+                    {% if role == "pemilik" %}
+                      <th class="num">Harga Beli</th>
+                    {% endif %}
+
+                    <th class="num">Harga Jual</th>
+
+                    {% if role == "pemilik" %}
+                      <th class="tx-aksi-col">Aksi</th>
+                    {% endif %}
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td colspan="{% if role == 'pemilik' %}10{% else %}8{% endif %}">
+                      Memuat data barang...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+          {% if role == "pemilik" %}
+            <div id="barang-editor-backdrop">
+              <div class="barang-editor-card" role="dialog" aria-modal="true" aria-label="Form Barang">
+                <div class="barang-editor-head">
+                  <div>
+                    <div class="barang-editor-title" id="barangEditorTitle">Tambah Barang</div>
+                    <div class="barang-editor-sub">Kelola data barang</div>
+                  </div>
+
+                  <button
+                    type="button"
+                    class="barang-editor-close"
+                    data-barang-editor-close
+                    aria-label="Tutup"
+                  >
+                    ×
+                  </button>
+                </div>
+
+                <form id="barangEditorForm" class="barang-editor-body" novalidate>
+                  <div class="barang-editor-grid">
+
+                    <div class="barang-editor-field">
+                      <label for="ieJenis">Kategori</label>
+                      <select id="ieJenis" name="jenis_barang" required>
+                        <option value="">Pilih Kategori</option>
+                      </select>
+                    </div>
+
+                    <div class="barang-editor-field">
+                      <label for="ieSupplier">Supplier Utama</label>
+                      <select id="ieSupplier" name="id_supplier" required>
+                        <option value="">Pilih Supplier Utama</option>
+                      </select>
+                    </div>
+
+                    <div class="barang-editor-field">
+                      <label for="ieKode">Kode Barang</label>
+                      <input id="ieKode" name="kode_barang" type="text" readonly required>
+                    </div>
+
+                    <div class="barang-editor-field">
+                      <label for="ieNama">Nama Barang</label>
+                      <input
+                        id="ieNama"
+                        name="nama_barang"
+                        type="text"
+                        placeholder="Masukkan nama barang"
+                        required
+                      >
+                    </div>
+
+                    <div class="barang-editor-field">
+                      <label for="ieSatuanAngka" id="ieSatuanAngkaLabel">Besaran Angka</label>
+                      <input
+                        id="ieSatuanAngka"
+                        name="satuan_angka"
+                        type="text"
+                        inputmode="decimal"
+                        placeholder="Contoh: 250"
+                      >
+                    </div>
+
+                    <div class="barang-editor-field">
+                      <label for="ieSatuanUnit">Unit Satuan</label>
+                      <select id="ieSatuanUnit" name="satuan_unit">
+                        <option value="">Pilih satuan</option>
+                      </select>
+                    </div>
+
+                    <div class="barang-editor-field">
+                      <label for="ieStok" id="ieStokLabel">Jumlah Barang</label>
+                      <input
+                        id="ieStok"
+                        name="stok_saat_ini"
+                        type="number"
+                        min="0"
+                        step="1"
+                        placeholder="Contoh: 10"
+                        required
+                      >
+                    </div>
+
+                    <div class="barang-editor-field">
+                      <label for="ieStokMinimal">Stok Minimal</label>
+                      <input
+                        id="ieStokMinimal"
+                        name="stok_minimal"
+                        type="number"
+                        min="0"
+                        step="1"
+                        placeholder="Contoh: 5"
+                        required
+                      >
+                    </div>
+
+                    <div class="barang-editor-field">
+                      <label for="ieHargaBeli">Harga Beli</label>
+                      <input
+                        id="ieHargaBeli"
+                        name="harga_beli"
+                        type="number"
+                        min="0"
+                        step="1"
+                        placeholder="Contoh: 34000"
+                        required
+                      >
+                    </div>
+
+                    <div class="barang-editor-field">
+                      <label for="ieHarga">Harga Jual</label>
+                      <input
+                        id="ieHarga"
+                        name="harga_jual"
+                        type="number"
+                        min="0"
+                        step="1"
+                        placeholder="Contoh: 40000"
+                        required
+                      >
+                    </div>
+
+                  </div>
+
+                  <div class="barang-editor-preview">
+                    <span>Kode otomatis: <strong id="ieKodePreview">-</strong></span>
+                    <span>Satuan gabungan: <strong id="ieSatuanPreview">-</strong></span>
+                    <span>Preview harga beli: <strong id="ieHargaBeliPreview">Rp 0</strong></span>
+                    <span>Preview harga jual: <strong id="ieHargaPreview">Rp 0</strong></span>
+                  </div>
+
+                  <div class="barang-editor-actions">
+                    <button type="submit" class="barang-editor-save" id="ieSaveBtn">
+                      Simpan Barang
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          {% endif %}
+
+        </div>
+
+      </section>
+    </main>
+
+  </div>
+</body>
+</html>

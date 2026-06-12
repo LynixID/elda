@@ -1,0 +1,258 @@
+{% load static %}
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <title>Riwayat Pengembalian - Sistem Kasir Harmoni Agro</title>
+
+  <meta name="csrf-token" content="{{ csrf_token }}">
+
+  <link rel="stylesheet" href="{% static 'kasir/css/home.css' %}?v=171">
+  <link rel="stylesheet" href="{% static 'kasir/css/pembelian.css' %}?v=pengembalianBase01">
+  <link rel="stylesheet" href="{% static 'kasir/css/pengembalian.css' %}?v=pengembalianClean111">
+
+  <script src="{% static 'kasir/js/pengembalian.js' %}?v=pengembalianFix111" defer></script>
+</head>
+
+<body
+  class="home-page navbar-mode halaman-pengembalian pb-page pembelian-page-body pb-top-hidden"
+  data-role="{{ role|default:'' }}"
+  data-nama-kasir="{{ nama|default:'' }}"
+  data-pengembalian-json-url="{% url 'kasir:pengembalian_json' %}"
+>
+  <div class="app-shell pengembalian-shell">
+
+    <header class="main-navbar">
+
+      <div class="navbar-top">
+        <div class="nav-brand-wrap">
+          <a class="nav-brand" href="{% url 'kasir:home' %}">
+            <img
+              class="nav-brand-logo"
+              src="{% static 'kasir/img/logo_pertanian.png' %}"
+              alt="Logo Toko Pertanian Harmoni Agro"
+            >
+
+            <span class="nav-brand-copy">
+              <span class="nav-brand-kicker">Sistem Kasir</span>
+              <span class="nav-brand-text">Harmoni Agro</span>
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <div class="navbar-bottom">
+        <nav class="nav-menu" aria-label="Menu utama">
+
+          <a class="nav-link" href="{% url 'kasir:home' %}">
+            Beranda
+          </a>
+
+          <div class="nav-dropdown" data-nav-dropdown>
+            <button
+              class="nav-toggle active"
+              type="button"
+              data-nav-toggle
+              aria-expanded="false"
+            >
+              Transaksi
+              <span class="nav-caret"></span>
+            </button>
+
+            <div class="nav-dropdown-menu nav-dropdown-menu-rich">
+
+              <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:transaksi' %}">
+                <span class="nav-item-icon">🧾</span>
+                <span class="nav-item-copy">
+                  <span class="nav-item-title">Penjualan</span>
+                  <span class="nav-item-desc">Mulai transaksi</span>
+                </span>
+              </a>
+
+              {% if role == "pemilik" %}
+              <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:pembelian' %}">
+                <span class="nav-item-icon">📦</span>
+                <span class="nav-item-copy">
+                  <span class="nav-item-title">Pembelian</span>
+                  <span class="nav-item-desc">Kelola pembelian stok</span>
+                </span>
+              </a>
+
+              <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:retur' %}">
+                <span class="nav-item-icon">↩️</span>
+                <span class="nav-item-copy">
+                  <span class="nav-item-title">Retur Pembelian</span>
+                  <span class="nav-item-desc">Barang rusak / tidak sesuai</span>
+                </span>
+              </a>
+
+              <a class="nav-dropdown-item nav-dropdown-item-rich active" href="{% url 'kasir:pengembalian' %}">
+                <span class="nav-item-icon">📑</span>
+                <span class="nav-item-copy">
+                  <span class="nav-item-title">Riwayat Pengembalian</span>
+                  <span class="nav-item-desc">Hasil retur supplier</span>
+                </span>
+              </a>
+              {% endif %}
+
+            </div>
+          </div>
+
+          {% if role == "pemilik" %}
+          <div class="nav-dropdown" data-nav-dropdown>
+            <button
+              class="nav-toggle"
+              type="button"
+              data-nav-toggle
+              aria-expanded="false"
+            >
+              Master Data
+              <span class="nav-caret"></span>
+            </button>
+
+            <div class="nav-dropdown-menu nav-dropdown-menu-rich">
+
+              <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:barang' %}">
+                <span class="nav-item-icon">📋</span>
+                <span class="nav-item-copy">
+                  <span class="nav-item-title">Data Barang</span>
+                  <span class="nav-item-desc">Kelola data barang</span>
+                </span>
+              </a>
+
+              <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:kategori' %}">
+                <span class="nav-item-icon">🏷️</span>
+                <span class="nav-item-copy">
+                  <span class="nav-item-title">Data Kategori</span>
+                  <span class="nav-item-desc">Kelola kategori barang</span>
+                </span>
+              </a>
+
+              <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:pembelian' %}#supplier">
+                <span class="nav-item-icon">🤝</span>
+                <span class="nav-item-copy">
+                  <span class="nav-item-title">Data Supplier</span>
+                  <span class="nav-item-desc">Kelola supplier pembelian</span>
+                </span>
+              </a>
+
+            </div>
+          </div>
+          {% endif %}
+
+          <a class="nav-link" href="{% url 'kasir:riwayat' %}">
+            Riwayat
+          </a>
+
+          {% if role == "pemilik" %}
+          <a class="nav-link" href="{% url 'kasir:pendapatan' %}">
+            Pendapatan
+          </a>
+
+          <a class="nav-link" href="{% url 'kasir:rekomendasi' %}">
+            Rekomendasi
+          </a>
+          {% endif %}
+
+        </nav>
+
+        <div class="pb-nav-tools">
+          <button
+            class="pb-nav-toggle"
+            type="button"
+            data-pb-toggle-top
+            aria-expanded="false"
+          >
+            Tampilkan Atas
+          </button>
+        </div>
+      </div>
+
+    </header>
+
+    <main class="main-content-area">
+      <section class="pengembalian-wrap">
+
+        <div class="pengembalian-title-card">
+          <h1>Riwayat Pengembalian</h1>
+
+          <div class="pengembalian-title-total">
+            <small>Total</small>
+            <strong id="pengembalianTotalRiwayat">0</strong>
+          </div>
+        </div>
+
+        <div class="pengembalian-summary-grid">
+
+          <div class="pengembalian-summary-card">
+            <span>Total Pengembalian</span>
+            <strong id="pengembalianTotalData">0</strong>
+          </div>
+
+          <div class="pengembalian-summary-card green">
+            <span>Barang Pengganti</span>
+            <strong id="pengembalianTotalBarang">0</strong>
+          </div>
+
+          <div class="pengembalian-summary-card yellow">
+            <span>Refund</span>
+            <strong id="pengembalianTotalRefund">0</strong>
+          </div>
+
+          <div class="pengembalian-summary-card blue">
+            <span>Selesai</span>
+            <strong id="pengembalianTotalSelesai">0</strong>
+          </div>
+
+        </div>
+
+        <div class="pengembalian-card">
+
+          <div class="pengembalian-card-head">
+            <h2>Data Penyelesaian Retur</h2>
+
+            <button
+              class="pengembalian-btn light"
+              type="button"
+              id="btnRefreshPengembalian"
+            >
+              Refresh
+            </button>
+          </div>
+
+          <div class="pengembalian-table-wrap">
+            <table class="pengembalian-table">
+              <thead>
+                <tr>
+                  <th>No Pengembalian</th>
+                  <th>No Pembelian</th>
+                  <th>Barang</th>
+                  <th>Supplier</th>
+                  <th>Jenis</th>
+                  <th>Qty Pengganti</th>
+                  <th>Nominal Refund</th>
+                  <th>Tanggal</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody id="pengembalianBody">
+                <tr>
+                  <td colspan="10" class="pengembalian-empty">
+                    Memuat data pengembalian...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+      </section>
+    </main>
+
+  </div>
+</body>
+</html>

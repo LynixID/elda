@@ -1,0 +1,423 @@
+{% load static %}
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Transaksi - Sistem Kasir Harmoni Agro</title>
+
+  <meta name="csrf-token" content="{{ csrf_token }}">
+
+  <link rel="stylesheet" href="{% static 'kasir/css/home.css' %}?v=2241">
+  <link rel="stylesheet" href="{% static 'kasir/css/transaksi.css' %}?v=2028split112">
+
+  <script>
+    window.TX_BARANG = JSON.parse('{{ tx_barang_json|escapejs }}');
+    window.TX_SAVE_URL = "{% url 'kasir:transaksi_simpan' %}";
+    window.TX_BARANG_PAGE_URL = "{% url 'kasir:barang' %}";
+    window.TX_BARANG_JSON_URL = "{% url 'kasir:barang_json' %}";
+    window.TX_MIDTRANS_TOKEN_URL = "{% url 'kasir:transaksi_midtrans_token' %}";
+  </script>
+
+  <script src="{% static 'kasir/js/home.js' %}?v=2241" defer></script>
+
+  <script
+    src="https://app.sandbox.midtrans.com/snap/snap.js"
+    data-client-key="{{ midtrans_client_key }}"
+  ></script>
+
+  <script src="{% static 'kasir/js/transaksi.js' %}?v=2026qris119" defer></script>
+</head>
+
+<body
+  class="home-page navbar-mode tx-inline-body tx-nav-collapsed"
+  data-role="{{ role|default:'' }}"
+  data-nama-kasir="{{ nama|default:username|default:'' }}"
+  data-midtrans-token-url="{% url 'kasir:transaksi_midtrans_token' %}"
+  data-midtrans-client-key="{{ midtrans_client_key|default:'' }}"
+>
+  <div class="app-shell tx-app-shell">
+
+    <header class="main-navbar">
+      <div class="navbar-top">
+        <div class="nav-brand-wrap">
+          <a href="{% url 'kasir:home' %}" class="nav-brand">
+            <img
+              src="{% static 'kasir/img/logo_pertanian.png' %}"
+              alt="Toko Pertanian Harmoni Agro"
+              class="nav-brand-logo"
+            >
+            <div class="nav-brand-copy">
+              <span class="nav-brand-kicker">Sistem Kasir</span>
+              <span class="nav-brand-text">Harmoni Agro</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="navbar-bottom">
+        <nav class="nav-menu" aria-label="Menu utama">
+          <a class="nav-link" href="{% url 'kasir:home' %}">Beranda</a>
+
+          <div class="nav-dropdown">
+            <button type="button" class="nav-link nav-toggle active" aria-expanded="false">
+              <span>Transaksi</span>
+              <span class="nav-caret" aria-hidden="true"></span>
+            </button>
+
+            <div class="nav-dropdown-menu nav-dropdown-menu-rich">
+              <a href="{% url 'kasir:transaksi' %}" class="nav-dropdown-item nav-dropdown-item-rich active" aria-current="page">
+                <span class="nav-item-icon" aria-hidden="true">🧾</span>
+                <span class="nav-item-copy">
+                  <span class="nav-item-title">Penjualan</span>
+                  <span class="nav-item-desc">Input transaksi penjualan</span>
+                </span>
+              </a>
+
+              {% if role == "pemilik" %}
+                <a href="{% url 'kasir:pembelian' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+                  <span class="nav-item-icon" aria-hidden="true">📦</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Pembelian</span>
+                    <span class="nav-item-desc">Kelola transaksi pembelian stok</span>
+                  </span>
+                </a>
+
+                <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:retur' %}">
+                  <span class="nav-item-icon">↩️</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Retur Pembelian</span>
+                    <span class="nav-item-desc">Barang rusak / tidak sesuai</span>
+                  </span>
+                </a>
+
+                <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:pengembalian' %}">
+                  <span class="nav-item-icon" aria-hidden="true">📑</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Riwayat Pengembalian</span>
+                    <span class="nav-item-desc">Hasil retur dari supplier</span>
+                  </span>
+                </a>
+              {% endif %}
+            </div>
+          </div>
+
+          {% if role == "pemilik" %}
+            <div class="nav-dropdown">
+              <button type="button" class="nav-link nav-toggle" aria-expanded="false">
+                <span>Master Data</span>
+                <span class="nav-caret" aria-hidden="true"></span>
+              </button>
+
+              <div class="nav-dropdown-menu nav-dropdown-menu-rich">
+                <a href="{% url 'kasir:barang' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+                  <span class="nav-item-icon" aria-hidden="true">📋</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Data Barang</span>
+                    <span class="nav-item-desc">Kelola data barang di gudang</span>
+                  </span>
+                </a>
+
+                <a href="{% url 'kasir:kategori' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+                  <span class="nav-item-icon" aria-hidden="true">🏷️</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Data Kategori</span>
+                    <span class="nav-item-desc">Kelola kategori barang</span>
+                  </span>
+                </a>
+
+                <a href="{% url 'kasir:pembelian' %}#supplier" class="nav-dropdown-item nav-dropdown-item-rich">
+                  <span class="nav-item-icon" aria-hidden="true">🤝</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Data Supplier</span>
+                    <span class="nav-item-desc">Kelola data supplier pembelian</span>
+                  </span>
+                </a>
+              </div>
+            </div>
+          {% endif %}
+
+          <a class="nav-link" href="{% url 'kasir:riwayat' %}">Riwayat</a>
+
+          {% if role == "pemilik" %}
+            <a class="nav-link" href="{% url 'kasir:pendapatan' %}">Pendapatan</a>
+            <a class="nav-link" href="{% url 'kasir:rekomendasi' %}">Rekomendasi</a>
+          {% endif %}
+        </nav>
+
+        <div class="tx-nav-tools">
+          <div class="tx-topbar-mode">
+            <label for="txSumberPenjualan">Jenis</label>
+            <select id="txSumberPenjualan" class="tx-headSelect">
+              <option value="offline" selected>Offline</option>
+              <option value="online">Online</option>
+            </select>
+          </div>
+
+          <div
+            class="tx-topbar-mode"
+            data-tx-offline-only
+            data-tx-display="grid"
+          >
+            <label for="txMetodeBayar">Metode</label>
+            <select id="txMetodeBayar" class="tx-headSelect">
+              <option value="tunai" selected>Tunai</option>
+              <option value="qris">QRIS</option>
+            </select>
+          </div>
+
+          <div
+            class="tx-topbar-mode"
+            data-tx-online-only
+            data-tx-display="grid"
+            style="display:none;"
+          >
+            <label for="txMarketplace">Market</label>
+            <select id="txMarketplace" class="tx-headSelect">
+              <option value="shopee" selected>Shopee</option>
+              <option value="tiktok">TikTok Shop</option>
+            </select>
+          </div>
+
+          <button
+            id="txNavToggle"
+            class="tx-nav-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-label="Tampilkan atau sembunyikan topbar atas"
+          >
+            Tampilkan Atas
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content-area tx-page">
+      <section class="content tx-contentWrap tx-inlineContent">
+
+        <div class="tx-inline-transaksi" id="tx-modal-transaksi" aria-hidden="false">
+          <div class="tx-saleCard tx-saleInlineCard" role="region" aria-label="Transaksi Penjualan">
+
+            <div class="tx-saleScroll">
+              <div class="tx-saleTop">
+                <div class="tx-topLeft">
+                  <label class="tx-label" for="txNoJual">No Jual</label>
+                  <div class="tx-inline">
+                    <input id="txNoJual" class="tx-input" type="text" placeholder="NOTA-xxxxxx">
+                    <button id="txBatal" class="tx-btn2 tx-btnGhost2" type="button">Batal</button>
+                  </div>
+                </div>
+
+                <div class="tx-topMid">
+                  <label class="tx-label" for="txTanggal">Tanggal</label>
+                  <input id="txTanggal" class="tx-input" type="date">
+                </div>
+
+                <div class="tx-topRight">
+                  <div class="tx-totalBox">
+                    <div class="tx-totalLabel">Total</div>
+                    <div class="tx-totalValue" id="txTotalBig">Rp 0</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tx-section">
+                <div class="tx-sectionTitle">Data Barang</div>
+
+                <div class="tx-rowWrap">
+                  <div class="tx-row">
+                    <div class="tx-searchWrap">
+                      <div class="tx-searchControl">
+                        <input
+                          id="txBarangSelect"
+                          class="tx-input tx-select"
+                          type="text"
+                          placeholder="Ketik kode / nama barang / satuan..."
+                          autocomplete="off"
+                        >
+                        <button
+                          id="txBarangToggle"
+                          class="tx-searchToggle"
+                          type="button"
+                          aria-label="Tampilkan semua barang"
+                          title="Tampilkan semua barang"
+                        >▼</button>
+                      </div>
+
+                      <div id="txBarangDropdown" class="tx-searchDropdown" hidden></div>
+                    </div>
+
+                    <input
+                      id="txNamaBarang"
+                      class="tx-input"
+                      type="text"
+                      placeholder="Nama barang (otomatis)"
+                      readonly
+                    >
+
+                    <input
+                      id="txHarga"
+                      class="tx-input"
+                      type="text"
+                      placeholder="Harga jual (otomatis)"
+                      readonly
+                    >
+
+                    <input
+                      id="txQty"
+                      class="tx-input tx-qty"
+                      type="number"
+                      min="1"
+                      value="1"
+                      placeholder="Qty beli"
+                    >
+
+                    <input
+                      id="txTotalItem"
+                      class="tx-input"
+                      type="text"
+                      placeholder="Total item"
+                      readonly
+                    >
+
+                    <button id="txTambahItem" class="tx-btn2 tx-btnPrimary" type="button">Tambah Item</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tx-section tx-detailSection">
+                <div class="tx-sectionTitle">Detail Barang</div>
+
+                <div class="tx-tableWrap">
+                  <table class="tx-table">
+                    <thead>
+                      <tr>
+                        <th>Kode Barang</th>
+                        <th>Nama Barang</th>
+                        <th>Satuan</th>
+                        <th class="num">Harga Jual</th>
+                        <th class="num">Jumlah</th>
+                        <th class="num">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody id="txDetailBody">
+                      <tr class="empty">
+                        <td colspan="6"><em>Belum ada item.</em></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="tx-detailActions">
+                  <button id="txHapusSemuaItem" class="tx-btn2 tx-btnDanger" type="button">Hapus Semua Item</button>
+                </div>
+              </div>
+
+              <div class="tx-footer">
+                <div class="tx-payBox">
+                  <div class="tx-payRow" data-tx-display="grid">
+                    <label for="txTotal">Total</label>
+                    <input id="txTotal" class="tx-input" type="text" readonly>
+                  </div>
+
+                  <div
+                    class="tx-payRow"
+                    data-tx-offline-only
+                    data-tx-cash-only
+                    data-tx-display="grid"
+                  >
+                    <label for="txBayar">Bayar</label>
+                    <input id="txBayar" class="tx-input" type="number" min="0" placeholder="0">
+                  </div>
+
+                  <div
+                    class="tx-payRow"
+                    data-tx-offline-only
+                    data-tx-cash-only
+                    data-tx-display="grid"
+                  >
+                    <label for="txKembali">Kembalian</label>
+                    <input id="txKembali" class="tx-input" type="text" readonly>
+                  </div>
+                </div>
+                
+                <div
+                  class="tx-qrisPanel tx-qrisPanel-simple"
+                  id="txQrisPanel"
+                  data-tx-qris-only
+                  data-tx-display="flex"
+                  style="display:none;"
+                >
+                  <div class="tx-qrisAmount">
+                    <small>Total Bayar</small>
+                    <strong id="txQrisTotal">Rp 0</strong>
+                  </div>
+
+                  <button
+                    id="txBayarQris"
+                    class="tx-btn2 tx-btnPrimary tx-btnQris"
+                    type="button"
+                  >
+                    Bayar QRIS
+                  </button>
+
+                  <small id="txQrisStatus" class="tx-qrisStatus" style="display:none;">
+                    Belum dibayar
+                  </small>
+                </div>
+                <div class="tx-footerActions">
+                <button
+                  id="txCetak"
+                  class="tx-btn2 tx-btnGhost2"
+                  type="button"
+                  data-tx-offline-only
+                  data-tx-cash-only
+                  data-tx-display="inline-flex"
+                >
+                  Cetak
+                </button>
+
+                <button
+                  id="txSimpan"
+                  class="tx-btn2 tx-btnPrimary"
+                  type="button"
+                  data-tx-normal-save
+                  data-tx-display="inline-flex"
+                >
+                  Simpan
+                </button>
+              </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <div class="modal tx-modal" id="tx-modal-struk" aria-hidden="true">
+    <div class="modal-card tx-strukCard" role="dialog" aria-label="Preview Struk">
+      <div class="tx-strukHead">
+        <div>
+          <div class="tx-strukTitle">Preview Struk</div>
+        </div>
+
+        <div class="tx-strukHeadActions">
+          <button id="txSavePdf" class="tx-btn2 tx-btnGhost2" type="button">Simpan PDF</button>
+          <button id="txSavePng" class="tx-btn2 tx-btnGhost2" type="button">Simpan PNG</button>
+          <button id="txPrintNow" class="tx-btn2 tx-btnPrimary" type="button">Print</button>
+          <button class="tx-closeX" type="button" data-tx-close-struk aria-label="Tutup">×</button>
+        </div>
+      </div>
+
+      <div class="tx-strukBody">
+        <div class="tx-receiptPaperWrap">
+          <div class="tx-receiptPaper" id="txReceiptPaper"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

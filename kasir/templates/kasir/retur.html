@@ -1,0 +1,298 @@
+{% load static %}
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <title>Retur Pembelian - Sistem Kasir Harmoni Agro</title>
+  <meta name="csrf-token" content="{{ csrf_token }}">
+
+  <link rel="stylesheet" href="{% static 'kasir/css/home.css' %}?v=171">
+  <link rel="stylesheet" href="{% static 'kasir/css/pembelian.css' %}?v=returBase01">
+  <link rel="stylesheet" href="{% static 'kasir/css/retur.css' %}?v=returPopup01">
+
+  <script src="{% static 'kasir/js/retur.js' %}?v=returFixRefund01" defer></script>
+</head>
+
+<body
+  class="home-page navbar-mode halaman-retur pb-page pembelian-page-body pb-top-hidden"
+  data-role="{{ role|default:'' }}"
+  data-nama-kasir="{{ nama|default:'' }}"
+  data-retur-json-url="{% url 'kasir:retur_json' %}"
+  data-retur-detail-options-url="{% url 'kasir:retur_detail_options' %}"
+  data-retur-create-url="{% url 'kasir:retur_create' %}"
+  data-retur-status-url="{% url 'kasir:retur_update_status' %}"
+  data-retur-selesaikan-url="{% url 'kasir:retur_selesaikan' %}"
+>
+  <div class="app-shell retur-shell">
+
+    <header class="main-navbar">
+      <div class="navbar-top">
+        <div class="nav-brand-wrap">
+          <a class="nav-brand" href="{% url 'kasir:home' %}">
+            <img class="nav-brand-logo" src="{% static 'kasir/img/logo_pertanian.png' %}" alt="Logo">
+            <span class="nav-brand-copy">
+              <span class="nav-brand-kicker">Sistem Kasir</span>
+              <span class="nav-brand-text">Harmoni Agro</span>
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <div class="navbar-bottom">
+        <nav class="nav-menu" aria-label="Menu utama">
+          <a class="nav-link" href="{% url 'kasir:home' %}">Beranda</a>
+
+          <div class="nav-dropdown" data-nav-dropdown>
+            <button class="nav-toggle active" type="button" data-nav-toggle>
+              Transaksi <span class="nav-caret"></span>
+            </button>
+
+            <div class="nav-dropdown-menu nav-dropdown-menu-rich">
+              <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:transaksi' %}">
+                <span class="nav-item-icon">🧾</span>
+                <span class="nav-item-copy">
+                  <span class="nav-item-title">Penjualan</span>
+                  <span class="nav-item-desc">Mulai transaksi</span>
+                </span>
+              </a>
+
+              {% if role == "pemilik" %}
+              <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:pembelian' %}">
+                <span class="nav-item-icon">📦</span>
+                <span class="nav-item-copy">
+                  <span class="nav-item-title">Pembelian</span>
+                  <span class="nav-item-desc">Kelola pembelian stok</span>
+                </span>
+              </a>
+
+              <a class="nav-dropdown-item nav-dropdown-item-rich active" href="{% url 'kasir:retur' %}">
+                <span class="nav-item-icon">↩️</span>
+                <span class="nav-item-copy">
+                  <span class="nav-item-title">Retur Pembelian</span>
+                  <span class="nav-item-desc">Barang rusak / tidak sesuai</span>
+                </span>
+              </a>
+
+              <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:pengembalian' %}">
+                <span class="nav-item-icon">📑</span>
+                <span class="nav-item-copy">
+                  <span class="nav-item-title">Riwayat Pengembalian</span>
+                  <span class="nav-item-desc">Hasil retur supplier</span>
+                </span>
+              </a>
+              {% endif %}
+            </div>
+          </div>
+
+          {% if role == "pemilik" %}
+          <div class="nav-dropdown" data-nav-dropdown>
+            <button class="nav-toggle" type="button" data-nav-toggle>
+              Master Data <span class="nav-caret"></span>
+            </button>
+
+            <div class="nav-dropdown-menu nav-dropdown-menu-rich">
+              <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:barang' %}">
+                <span class="nav-item-icon">📋</span>
+                <span class="nav-item-copy">
+                  <span class="nav-item-title">Data Barang</span>
+                  <span class="nav-item-desc">Kelola data barang</span>
+                </span>
+              </a>
+
+              <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:kategori' %}">
+                <span class="nav-item-icon">🏷️</span>
+                <span class="nav-item-copy">
+                  <span class="nav-item-title">Data Kategori</span>
+                  <span class="nav-item-desc">Kelola kategori barang</span>
+                </span>
+              </a>
+
+              <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:pembelian' %}#supplier">
+                <span class="nav-item-icon">🤝</span>
+                <span class="nav-item-copy">
+                  <span class="nav-item-title">Data Supplier</span>
+                  <span class="nav-item-desc">Kelola supplier pembelian</span>
+                </span>
+              </a>
+            </div>
+          </div>
+          {% endif %}
+
+          <a class="nav-link" href="{% url 'kasir:riwayat' %}">Riwayat</a>
+
+          {% if role == "pemilik" %}
+          <a class="nav-link" href="{% url 'kasir:pendapatan' %}">Pendapatan</a>
+          <a class="nav-link" href="{% url 'kasir:rekomendasi' %}">Rekomendasi</a>
+          {% endif %}
+        </nav>
+
+        <div class="pb-nav-tools">
+          <button class="pb-nav-toggle" type="button" data-pb-toggle-top>
+            Tampilkan Atas
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content-area">
+      <section class="retur-wrap">
+
+        <div class="retur-title-card">
+          <div>
+            <h1>Retur Pembelian</h1>
+          </div>
+
+          <a class="retur-btn retur-btn-primary retur-open-form" href="#modalInputRetur">
+            Buat Retur
+          </a>
+        </div>
+
+        <div class="retur-grid-summary">
+          <div class="retur-summary-card">
+            <span>Total Retur</span>
+            <strong id="returTotalData">0</strong>
+          </div>
+
+          <div class="retur-summary-card proses">
+            <span>Belum Selesai</span>
+            <strong id="returTotalDiproses">0</strong>
+          </div>
+
+          <div class="retur-summary-card selesai">
+            <span>Selesai</span>
+            <strong id="returTotalSelesai">0</strong>
+          </div>
+
+          <div class="retur-summary-card warning">
+            <span>Batal</span>
+            <strong id="returTotalBatal">0</strong>
+          </div>
+        </div>
+
+        <div class="retur-card">
+          <div class="retur-card-head retur-card-head-row">
+            <h2>Daftar Retur</h2>
+
+            <button class="retur-btn retur-btn-light" type="button" id="btnRefreshRetur">
+              Refresh
+            </button>
+          </div>
+
+          <div class="retur-table-wrap">
+            <table class="retur-table">
+              <thead>
+                <tr>
+                  <th>ID Retur</th>
+                  <th>No Pembelian</th>
+                  <th>Barang</th>
+                  <th>Supplier</th>
+                  <th>Jumlah</th>
+                  <th>Alasan</th>
+                  <th>Tanggal</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+
+              <tbody id="returBody">
+                <tr>
+                  <td colspan="9" class="retur-empty">Memuat data retur...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <!-- POPUP INPUT RETUR -->
+  <div class="retur-popup" id="modalInputRetur">
+    <a class="retur-popup-bg" href="#"></a>
+
+    <div class="retur-popup-card">
+      <div class="retur-popup-head">
+        <h3>Input Retur</h3>
+        <a class="retur-popup-close" href="#">×</a>
+      </div>
+
+      <div class="retur-form-grid">
+        <div class="retur-field retur-field-full">
+          <label for="returDetailSelect">Item Pembelian</label>
+          <select id="returDetailSelect">
+            <option value="">Memuat item pembelian...</option>
+          </select>
+        </div>
+
+        <div class="retur-field">
+          <label for="returJumlah">Jumlah Retur</label>
+          <input id="returJumlah" type="number" min="1" value="1">
+        </div>
+
+        <div class="retur-field">
+          <label for="returSisaInfo">Sisa Bisa Retur</label>
+          <input id="returSisaInfo" type="text" value="-" readonly>
+        </div>
+
+        <div class="retur-field retur-field-full">
+          <label for="returAlasan">Alasan Retur</label>
+          <textarea id="returAlasan" placeholder="Contoh: barang rusak / salah barang"></textarea>
+        </div>
+      </div>
+
+      <div class="retur-actions">
+        <button class="retur-btn retur-btn-light" type="button" id="btnResetRetur">
+          Reset
+        </button>
+
+        <button class="retur-btn retur-btn-primary" type="button" id="btnSimpanRetur">
+          Simpan Retur
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP SELESAIKAN RETUR -->
+  <div class="retur-modal-backdrop" id="modalSelesaiRetur" hidden>
+    <div class="retur-modal">
+      <div class="retur-modal-head">
+        <h3>Selesaikan Retur</h3>
+        <button type="button" class="retur-modal-close" id="btnTutupModalRetur">×</button>
+      </div>
+
+      <input type="hidden" id="returSelesaiId">
+
+      <div class="retur-field">
+        <label for="jenisPenyelesaianRetur">Jenis Penyelesaian</label>
+        <select id="jenisPenyelesaianRetur">
+          <option value="barang_pengganti">Barang Pengganti</option>
+          <option value="refund">Refund</option>
+        </select>
+      </div>
+
+      <div class="retur-field" id="fieldQtyPenggantiRetur">
+        <label for="qtyPenggantiRetur">Qty Barang Pengganti</label>
+        <input id="qtyPenggantiRetur" type="number" min="1" value="1">
+      </div>
+
+      <div class="retur-field" id="fieldRefundRetur">
+        <label for="nominalRefundRetur">Nominal Refund</label>
+        <input id="nominalRefundRetur" type="text" placeholder="Rp 0" readonly>
+      </div>
+
+      <div class="retur-modal-actions">
+        <button type="button" class="retur-btn retur-btn-light" id="btnBatalSelesaiRetur">
+          Batal
+        </button>
+
+        <button type="button" class="retur-btn retur-btn-primary" id="btnSimpanSelesaiRetur">
+          Simpan
+        </button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

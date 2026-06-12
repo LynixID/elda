@@ -1,0 +1,469 @@
+{% load static %}
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pembelian - Sistem Kasir Harmoni Agro</title>
+  <meta name="csrf-token" content="{{ csrf_token }}">
+
+  <link rel="stylesheet" href="{% static 'kasir/css/pembelian.css' %}?v=pembelianFixSinkronFinal112">
+  <script src="{% static 'kasir/js/pembelian.js' %}?v=pembelianFixSinkronFinal112" defer></script>
+</head>
+
+<body
+  class="home-page navbar-mode pb-page pembelian-page-body pb-top-hidden"
+  data-role="{{ role|default:'' }}"
+  data-supplier-json-url="{% url 'kasir:supplier_json' %}"
+  data-supplier-create-url="{% url 'kasir:supplier_create' %}"
+  data-supplier-edit-url="{% url 'kasir:supplier_edit' %}"
+  data-supplier-delete-url="{% url 'kasir:supplier_delete' %}"
+  data-barang-json-url="{% url 'kasir:barang_json' %}"
+  data-pembelian-json-url="{% url 'kasir:pembelian_json' %}"
+  data-pembelian-delete-url="{% url 'kasir:pembelian_delete' %}"
+  data-pembelian-simpan-url="{% url 'kasir:pembelian_simpan' %}"
+  data-pembelian-terima-url="{% url 'kasir:pembelian_terima' %}"
+>
+<div class="app-shell">
+
+<header class="main-navbar">
+
+  <div class="navbar-top">
+    <div class="nav-brand-wrap">
+      <a href="{% url 'kasir:home' %}" class="nav-brand">
+        <img
+          src="{% static 'kasir/img/logo_pertanian.png' %}"
+          alt="Toko Pertanian Harmoni Agro"
+          class="nav-brand-logo"
+        >
+
+        <div class="nav-brand-copy">
+          <span class="nav-brand-kicker">Sistem Kasir</span>
+          <span class="nav-brand-text">Harmoni Agro</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="navbar-bottom">
+    <nav class="nav-menu" aria-label="Menu utama">
+
+      <a class="nav-link" href="{% url 'kasir:home' %}">
+        Beranda
+      </a>
+
+      <div class="nav-dropdown" data-nav-dropdown>
+        <button
+          type="button"
+          class="nav-link nav-toggle active"
+          data-nav-toggle
+          aria-expanded="false"
+        >
+          <span>Transaksi</span>
+          <span class="nav-caret" aria-hidden="true"></span>
+        </button>
+
+        <div class="nav-dropdown-menu nav-dropdown-menu-rich">
+          <a href="{% url 'kasir:transaksi' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+            <span class="nav-item-icon" aria-hidden="true">🧾</span>
+            <span class="nav-item-copy">
+              <span class="nav-item-title">Penjualan</span>
+              <span class="nav-item-desc">Input transaksi penjualan</span>
+            </span>
+          </a>
+
+          {% if role == "pemilik" %}
+            <a
+              href="{% url 'kasir:pembelian' %}"
+              class="nav-dropdown-item nav-dropdown-item-rich active"
+              aria-current="page"
+            >
+              <span class="nav-item-icon" aria-hidden="true">📦</span>
+              <span class="nav-item-copy">
+                <span class="nav-item-title">Pembelian</span>
+                <span class="nav-item-desc">Kelola transaksi pembelian stok</span>
+              </span>
+            </a>
+
+            <a href="{% url 'kasir:retur' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+              <span class="nav-item-icon" aria-hidden="true">↩️</span>
+              <span class="nav-item-copy">
+                <span class="nav-item-title">Retur Pembelian</span>
+                <span class="nav-item-desc">Barang rusak / tidak sesuai</span>
+              </span>
+            </a>
+
+            <a href="{% url 'kasir:pengembalian' %}" class="nav-dropdown-item nav-dropdown-item-rich" >
+              <span class="nav-item-icon" aria-hidden="true">📑</span>
+              <span class="nav-item-copy">
+                <span class="nav-item-title">Riwayat Pengembalian</span>
+                <span class="nav-item-desc">Hasil retur dari supplier</span>
+              </span>
+            </a>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if role == "pemilik" %}
+        <div class="nav-dropdown" data-nav-dropdown>
+          <button
+            type="button"
+            class="nav-link nav-toggle"
+            data-nav-toggle
+            aria-expanded="false"
+          >
+            <span>Master Data</span>
+            <span class="nav-caret" aria-hidden="true"></span>
+          </button>
+
+          <div class="nav-dropdown-menu nav-dropdown-menu-rich">
+
+            <a href="{% url 'kasir:barang' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+              <span class="nav-item-icon" aria-hidden="true">📋</span>
+              <span class="nav-item-copy">
+                <span class="nav-item-title">Data Barang</span>
+                <span class="nav-item-desc">Kelola data barang di gudang</span>
+              </span>
+            </a>
+
+            <a href="{% url 'kasir:kategori' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+              <span class="nav-item-icon" aria-hidden="true">🏷️</span>
+              <span class="nav-item-copy">
+                <span class="nav-item-title">Data Kategori</span>
+                <span class="nav-item-desc">Kelola jenis/kategori barang</span>
+              </span>
+            </a>
+
+            <a href="{% url 'kasir:pembelian' %}#supplier" class="nav-dropdown-item nav-dropdown-item-rich">
+              <span class="nav-item-icon" aria-hidden="true">🤝</span>
+              <span class="nav-item-copy">
+                <span class="nav-item-title">Data Supplier</span>
+                <span class="nav-item-desc">Kelola data supplier pembelian</span>
+              </span>
+            </a>
+
+          </div>
+        </div>
+      {% endif %}
+
+      <a class="nav-link" href="{% url 'kasir:riwayat' %}">
+        Riwayat
+      </a>
+
+      {% if role == "pemilik" %}
+        <a class="nav-link" href="{% url 'kasir:pendapatan' %}">
+          Pendapatan
+        </a>
+
+        <a class="nav-link" href="{% url 'kasir:rekomendasi' %}">
+          Rekomendasi
+        </a>
+      {% endif %}
+
+    </nav>
+
+    <!-- TOMBOL KANAN -->
+    <div class="pb-nav-tools kategori-nav-tools">
+      <button
+        id="kategoriNavToggle"
+        class="pb-nav-toggle kategori-nav-toggle"
+        type="button"
+        data-pb-toggle-top
+        aria-expanded="false"
+        aria-label="Tampilkan atau sembunyikan topbar atas"
+      >
+        Tampilkan Atas
+      </button>
+    </div>
+  </div>
+</header>
+
+    <main class="main-content-area">
+      <section class="pb-wrap">
+        <div class="pb-top-actions">
+          <button class="pb-btn pb-btn-primary" type="button" id="btnOpenPembelian">
+            Buat Pembelian
+          </button>
+
+          <button class="pb-btn pb-btn-warn" type="button" id="btnOpenSupplier">
+            Kelola Supplier
+          </button>
+        </div>
+
+        <div class="pb-card">
+          <div class="pb-table-wrap">
+            <table class="pb-table" id="pembelianTable">
+              <thead>
+                <tr>
+                  <th>No Pembelian</th>
+                  <th>Supplier</th>
+                  <th>Tanggal</th>
+                  <th>Status</th>
+                  <th class="num">Total Item</th>
+                  <th class="num">Total Harga</th>
+                  <th>Tanggal Diterima</th>
+                  <th class="pb-aksi-col">Aksi</th>
+                </tr>
+              </thead>
+
+              <tbody id="pbBody">
+                <tr>
+                  <td colspan="8">Memuat data...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL SUPPLIER -->
+  <div class="pb-modal" id="supplierModal" aria-hidden="true">
+    <div class="pb-modal-card">
+      <div class="pb-modal-head">
+        <h2>Kelola Supplier</h2>
+        <button class="pb-x" type="button" data-close="#supplierModal">×</button>
+      </div>
+
+      <div class="pb-supplier-form">
+        <input type="hidden" id="supplierId">
+
+        <div class="pb-field">
+          <label for="supplierNama">Nama Supplier / Contact Person</label>
+          <input id="supplierNama" type="text" placeholder="Contoh: Suhadi">
+        </div>
+
+        <div class="pb-field">
+          <label for="supplierPerusahaan">Nama Perusahaan / Mitra</label>
+          <input id="supplierPerusahaan" type="text" placeholder="Contoh: CV Rizky Jaya">
+        </div>
+
+        <div class="pb-field">
+          <label for="supplierNoHp">No HP</label>
+          <input id="supplierNoHp" type="text" placeholder="08xxxxxxxxxx">
+        </div>
+
+        <div class="pb-field">
+          <label for="supplierStatus">Status</label>
+          <select id="supplierStatus">
+            <option value="aktif">Aktif</option>
+            <option value="tidak aktif">Tidak Aktif</option>
+          </select>
+        </div>
+
+        <input type="hidden" id="supplierAlamat">
+
+        <div class="pb-field">
+          <label for="supplierKabKota">Kabupaten / Kota</label>
+          <select id="supplierKabKota">
+            <option value="">Memuat kabupaten/kota...</option>
+          </select>
+        </div>
+
+        <div class="pb-field">
+          <label for="supplierKecamatan">Kecamatan</label>
+          <select id="supplierKecamatan" disabled>
+            <option value="">Pilih kabupaten/kota dulu</option>
+          </select>
+        </div>
+
+        <div class="pb-field">
+          <label for="supplierDesa">Desa / Kelurahan</label>
+          <select id="supplierDesa" disabled>
+            <option value="">Pilih kecamatan dulu</option>
+          </select>
+        </div>
+
+        <div class="pb-field">
+          <label for="supplierDetailAlamat">Detail Alamat / Jalan</label>
+          <input id="supplierDetailAlamat" type="text" placeholder="Contoh: Jl. Mawar No. 12">
+        </div>
+      </div>
+
+      <div class="pb-actions-end pb-actions-gap">
+        <button class="pb-btn" type="button" id="btnResetSupplier">Reset</button>
+        <button class="pb-btn pb-btn-primary" type="button" id="btnSaveSupplier">Simpan Supplier</button>
+      </div>
+
+      <div class="pb-table-wrap">
+        <table class="pb-table" id="supplierTable">
+          <thead>
+            <tr>
+              <th>Nama Supplier</th>
+              <th>Nama Perusahaan / Mitra</th>
+              <th>No HP</th>
+              <th>Alamat</th>
+              <th>Status</th>
+              <th class="pb-aksi-col">Aksi</th>
+            </tr>
+          </thead>
+
+          <tbody id="supplierBody">
+            <tr>
+              <td colspan="6">Memuat data supplier...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL BUAT PEMBELIAN -->
+  <div class="pb-modal" id="pembelianModal" aria-hidden="true">
+    <div class="pb-modal-card">
+      <div class="pb-modal-head">
+        <h2>Buat Pembelian</h2>
+        <button class="pb-x" type="button" data-close="#pembelianModal">×</button>
+      </div>
+
+      <div class="pb-grid">
+        <div class="pb-field">
+          <label for="pbNoPembelian">No Pembelian</label>
+          <input id="pbNoPembelian" type="text">
+        </div>
+
+        <div class="pb-field">
+          <label for="pbTanggal">Tanggal Pembelian</label>
+          <input id="pbTanggal" type="date">
+        </div>
+
+        <!-- Supplier dibuat otomatis dari barang/supplier barang, bukan dipilih manual -->
+        <div class="pb-field pb-field-full pb-supplier-auto-field">
+          <label for="pbSupplierAutoText">Supplier</label>
+          <input
+            id="pbSupplierAutoText"
+            type="text"
+            value="Otomatis mengikuti supplier barang"
+            readonly
+          >
+
+          <!-- Select tetap disediakan untuk JS/backend, tapi disembunyikan agar user tidak pilih manual -->
+          <select id="pbSupplierSelect" hidden aria-hidden="true"></select>
+        </div>
+      </div>
+
+      <div class="pb-detail-add">
+        <div class="pb-field">
+          <label for="pbBarangSelect">Barang</label>
+          <select id="pbBarangSelect"></select>
+        </div>
+
+        <div class="pb-field">
+          <label for="pbQty">Qty</label>
+          <input id="pbQty" type="number" min="1" value="1">
+        </div>
+
+        <div class="pb-field">
+          <label for="pbHargaBeli">Harga Beli</label>
+          <input id="pbHargaBeli" type="number" min="0" value="0">
+        </div>
+
+        <button class="pb-btn pb-btn-primary pb-btn-add" type="button" id="btnTambahDetail">
+          Tambah
+        </button>
+      </div>
+
+      <div class="pb-table-wrap">
+        <table class="pb-table">
+          <thead>
+            <tr>
+              <th>Kode</th>
+              <th>Nama</th>
+              <th>Supplier</th>
+              <th>Satuan</th>
+              <th class="num">Qty</th>
+              <th class="num">Harga Beli</th>
+              <th class="num">Subtotal</th>
+              <th class="pb-aksi-col">Aksi</th>
+            </tr>
+          </thead>
+
+          <tbody id="pbDetailBody">
+            <tr>
+              <td colspan="8">Belum ada item.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pb-actions-end">
+        <div class="pb-total-box">
+          Total: <span id="pbTotalText">Rp 0</span>
+        </div>
+
+        <button class="pb-btn pb-btn-primary" type="button" id="btnSavePembelian">
+          Simpan Pembelian
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DETAIL PEMBELIAN -->
+  <div class="pb-modal" id="detailPembelianModal" aria-hidden="true">
+    <div class="pb-modal-card pb-detail-card">
+      <div class="pb-modal-head">
+        <div>
+          <h2>Detail Pembelian</h2>
+          <p class="pb-detail-subtitle">Rincian nota pembelian dan item barang</p>
+        </div>
+
+        <button class="pb-x" type="button" data-close="#detailPembelianModal">×</button>
+      </div>
+
+      <div class="pb-detail-summary">
+        <div class="pb-detail-box">
+          <span>No Pembelian</span>
+          <strong id="detailNoPembelian">-</strong>
+        </div>
+
+        <div class="pb-detail-box">
+          <span>Supplier</span>
+          <strong id="detailSupplierPembelian">-</strong>
+        </div>
+
+        <div class="pb-detail-box">
+          <span>Tanggal</span>
+          <strong id="detailTanggalPembelian">-</strong>
+        </div>
+
+        <div class="pb-detail-box">
+          <span>Status</span>
+          <strong id="detailStatusPembelian">-</strong>
+        </div>
+
+        <div class="pb-detail-box">
+          <span>Total Item</span>
+          <strong id="detailTotalItemPembelian">0</strong>
+        </div>
+
+        <div class="pb-detail-box">
+          <span>Total Harga</span>
+          <strong id="detailTotalHargaPembelian">Rp 0</strong>
+        </div>
+      </div>
+
+      <div class="pb-table-wrap pb-detail-table-wrap">
+        <table class="pb-table">
+          <thead>
+            <tr>
+              <th>Kode</th>
+              <th>Nama Barang</th>
+              <th>Satuan</th>
+              <th class="num">Qty</th>
+              <th class="num">Harga Beli</th>
+              <th class="num">Subtotal</th>
+            </tr>
+          </thead>
+
+          <tbody id="detailItemPembelianBody">
+            <tr>
+              <td colspan="6">Belum ada detail item.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

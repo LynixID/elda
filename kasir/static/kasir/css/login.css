@@ -1,0 +1,387 @@
+/* ===== RESET ===== */
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body{
+  font-family: Arial, sans-serif;
+  height: 100vh;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* ===== THEME ===== */
+:root{
+  --green: #5A723B;
+  --card:  #FFFAED;
+  --border:#3F4D3C;
+}
+
+/* ===== LAYOUT ===== */
+.page{
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 1.05fr 1.15fr;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ===== BG GRADASI (FULL PAGE) ===== */
+.page::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: linear-gradient(
+    180deg,
+    #FFFFFF 10%,
+    var(--green) 66%,
+    var(--green) 100%
+  );
+  z-index: 0;
+  pointer-events:none;
+}
+
+/* ===== SEAM (NUTUP GARIS BATAS GRID) ===== */
+/* ✅ dibuat "kabut" simetris + blur besar + blend biar gak keliatan garis lurus */
+.page .seam{
+  position:absolute;
+  top:-2px;
+  bottom:-2px;
+
+  /* posisi tepat di batas 1.05fr | 1.15fr */
+  left: calc(1.05 / (1.05 + 1.15) * 100%);
+
+  /* ✅ lebih lebar supaya tepi garis ketutup */
+  width: 220px;
+  transform: translateX(-110px);
+
+  /* ✅ simetris: transparan -> agak putih -> transparan */
+  background: linear-gradient(to right,
+    rgba(255,255,255,0.00) 0%,
+    rgba(255,255,255,0.14) 18%,
+    rgba(255,255,255,0.24) 35%,
+    rgba(255,255,255,0.28) 50%,
+    rgba(255,255,255,0.20) 65%,
+    rgba(255,255,255,0.10) 82%,
+    rgba(255,255,255,0.00) 100%
+  );
+
+  /* ✅ blur besar biar jadi bayangan menyatu */
+  filter: blur(46px);
+
+  /* ✅ bikin nyatu sama foto & bg */
+  mix-blend-mode: soft-light;
+
+  opacity: 1;
+  z-index: 9;              /* di atas foto/bg, di bawah card */
+  pointer-events:none;
+}
+
+/* ===== JAGUNG FULL WIDTH ===== */
+.page::after{
+  content:"";
+  position:absolute;
+  left:0; right:0; bottom:0;
+
+  height: 340px;
+  transform: translateY(85px);
+
+  background: url("../img/jagung.png") bottom center / cover no-repeat;
+
+  opacity: .80;
+  mix-blend-mode: normal;
+
+  -webkit-mask-image: linear-gradient(to top,
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,1) 55%,
+    rgba(0,0,0,.55) 76%,
+    rgba(0,0,0,0) 100%
+  );
+  mask-image: linear-gradient(to top,
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,1) 55%,
+    rgba(0,0,0,.55) 76%,
+    rgba(0,0,0,0) 100%
+  );
+
+  z-index: 1;
+  pointer-events:none;
+}
+
+/* haze putih dari atas */
+.page .haze{
+  position:absolute;
+  inset:0;
+  background: linear-gradient(180deg,
+    rgba(255,255,255,0.78) 0%,
+    rgba(255,255,255,0.30) 28%,
+    rgba(255,255,255,0.00) 62%
+  );
+  z-index: 2;
+  pointer-events:none;
+}
+
+/* ===== LEFT (FOTO TOKO FULL / TIDAK ZOOM) ===== */
+.left{
+  position: relative;
+  overflow: hidden;
+  z-index: 3;
+}
+
+.left::before{
+  content:"";
+  position:absolute;
+  inset:0;
+
+  background: url("../img/toko.png") left center / contain no-repeat;
+
+  transform: translateX(-10px) scale(1.08);
+  transform-origin: left center;
+
+  filter: saturate(1.02) contrast(0.99) brightness(1.02);
+
+  /* ✅ feather lebih lebar biar gak ada tepi “kotak” */
+  -webkit-mask-image: linear-gradient(to right,
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,1) 68%,
+    rgba(0,0,0,.75) 82%,
+    rgba(0,0,0,.35) 92%,
+    rgba(0,0,0,0) 100%
+  );
+  mask-image: linear-gradient(to right,
+    rgba(0,0,0,1) 0%,
+    rgba(0,0,0,1) 68%,
+    rgba(0,0,0,.75) 82%,
+    rgba(0,0,0,.35) 92%,
+    rgba(0,0,0,0) 100%
+  );
+}
+
+/* ✅ kabut dari sisi kanan foto supaya nyatu halus (tanpa jadi panel) */
+.left::after{
+  content:"";
+  position:absolute;
+  top:-40px;
+  bottom:-40px;
+  right:-120px;       /* overlap ke kanan supaya nutup garis */
+  width: 520px;       /* lebar kabut */
+
+  pointer-events:none;
+
+  /* ✅ lembut: transparan → sedikit putih → transparan */
+  background: radial-gradient(
+    closest-side at 30% 50%,
+    rgba(255,255,255,0.22) 0%,
+    rgba(255,255,255,0.14) 35%,
+    rgba(255,255,255,0.06) 60%,
+    rgba(255,255,255,0.00) 100%
+  );
+
+  filter: blur(52px);
+  opacity: .95;
+  z-index: 8;         /* di atas foto, di bawah seam & card */
+  mix-blend-mode: soft-light;
+}
+
+/* overlay html dimatiin */
+.left-overlay{ display:none; }
+
+/* ===== RIGHT ===== */
+.right{
+  position: relative;
+  z-index: 4;
+  display:flex;
+}
+
+.right-bg{
+  flex: 1;
+  height: 100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding-left: clamp(14px, 3vw, 55px);
+  padding-right: 24px;
+
+  background: transparent;
+  position: relative;
+}
+
+/* ===== CARD (UKURAN TETEP, CUMA LEBIH KIRI) ===== */
+.card{
+  width: 330px;
+  max-width: 92vw;
+
+  background: var(--card);
+  border: 3px solid var(--border);
+  border-radius: 24px;
+
+  padding: 18px 18px 16px;
+  margin-top: 22px;
+
+  /* ✅ geser kiri sedikit lagi */
+  transform: translateX(-44px);
+
+  box-shadow:
+    0 16px 38px rgba(0,0,0,0.18),
+    0 2px 0 rgba(255,255,255,0.40) inset;
+
+  position: relative;
+  z-index: 20; /* ✅ di atas seam */
+}
+
+.card h1{
+  margin: 0 0 12px;
+  text-align:center;
+  font-size: 18px;
+  letter-spacing: .35px;
+  color:#111;
+  line-height: 1.2;
+  font-weight: 900;
+}
+
+/* ===== ALERT ===== */
+.alert{ margin-bottom: 10px; }
+.msg{
+  padding: 9px 10px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+.msg.error{ background:#ffe2e2; border:1px solid #ff9c9c; }
+.msg.success{ background:#e3ffe7; border:1px solid #8fe59d; }
+.msg.warning{ background:#fff4d6; border:1px solid #ffd17a; }
+
+/* ===== FORM ===== */
+.form{ display:flex; flex-direction:column; gap:10px; }
+
+.label{
+  font-weight: 900;
+  color:#111;
+  margin-top: 6px;
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+.input{
+  height: 42px;
+  width: 100%;
+  display:block;
+
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 2px solid #aab6a2;
+  outline: none;
+
+  font-size: 14.5px;
+  background: rgba(255,255,255,0.94);
+}
+
+.input:focus{
+  border-color: var(--border);
+  box-shadow: 0 0 0 3px rgba(63,77,60,0.15);
+}
+
+.pw-wrap{
+  position: relative;
+  width: 100%;
+}
+
+.pw-wrap .input{
+  padding-right: 52px;
+}
+
+.pw-toggle{
+  position:absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 36px;
+  height: 36px;
+
+  border: none;
+  background: transparent;
+  cursor: pointer;
+
+  display:grid;
+  place-items:center;
+  padding:0;
+
+  opacity: .90;
+}
+.pw-toggle:hover{ opacity: 1; }
+
+.pw-toggle svg{
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: #2b2b2b;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top: 4px;
+}
+
+.remember{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:#222;
+  font-size:13.5px;
+}
+
+.forgot{
+  color:#222;
+  text-decoration:none;
+  font-size:13.5px;
+}
+.forgot:hover{ text-decoration:underline; }
+
+.btn{
+  margin-top: 12px;
+  height: 42px;
+  width: 100%;
+  border:none;
+  border-radius: 14px;
+  background: #3f5b2c;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 900;
+  cursor:pointer;
+}
+.btn:hover{ filter: brightness(0.96); }
+
+/* RESPONSIVE */
+@media (max-width: 980px){
+  body{ overflow:auto; }
+  .page{
+    grid-template-columns: 1fr;
+    height:auto;
+    min-height:100vh;
+  }
+  .left{ display:none; }
+  .page .seam{ display:none; }
+  .left::after{ display:none; }
+
+  .right-bg{
+    justify-content:center;
+    padding: 36px 18px;
+    height:auto;
+    min-height:100vh;
+  }
+  .page::after{
+    height: 240px;
+    transform: translateY(40px);
+  }
+  .card{
+    width: 340px;
+    margin-top: 0;
+    transform: none;
+  }
+}

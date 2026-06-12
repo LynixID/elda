@@ -1,0 +1,308 @@
+{% load static %}
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Data Kategori - Sistem Kasir Harmoni Agro</title>
+
+  <meta name="csrf-token" content="{{ csrf_token }}">
+
+  <link rel="stylesheet" href="{% static 'kasir/css/home.css' %}?v=2242">
+  <link rel="stylesheet" href="{% static 'kasir/css/kategori.css' %}?v=2028kategori111">
+
+  <script>
+    window.KATEGORI_JSON_URL = "{% url 'kasir:kategori_json' %}";
+    window.KATEGORI_CREATE_URL = "{% url 'kasir:kategori_create' %}";
+    window.KATEGORI_EDIT_URL = "{% url 'kasir:kategori_edit' %}";
+    window.KATEGORI_DELETE_URL = "{% url 'kasir:kategori_delete' %}";
+    window.KATEGORI_DELETE_ALL_URL = "{% url 'kasir:kategori_delete_all' %}";
+
+    window.TX_KATEGORI_PAGE_URL = "{% url 'kasir:kategori' %}";
+    window.TX_KATEGORI_JSON_URL = "{% url 'kasir:kategori_json' %}";
+    window.TX_BARANG_PAGE_URL = "{% url 'kasir:barang' %}";
+  </script>
+
+  <script src="{% static 'kasir/js/home.js' %}?v=2242" defer></script>
+  <script src="{% static 'kasir/js/kategori.js' %}?v=2028kategori111" defer></script>
+</head>
+
+<body
+  class="home-page navbar-mode kategori-page-body kategori-nav-collapsed"
+  data-role="{{ role|default:'' }}"
+  data-nama-kasir="{{ nama|default:username|default:'' }}"
+>
+  <div class="app-shell">
+
+    <!-- =========================
+         NAVBAR
+    ========================== -->
+    <header class="main-navbar">
+
+      <div class="navbar-top">
+        <div class="nav-brand-wrap">
+          <a href="{% url 'kasir:home' %}" class="nav-brand">
+            <img
+              src="{% static 'kasir/img/logo_pertanian.png' %}"
+              alt="Toko Pertanian Harmoni Agro"
+              class="nav-brand-logo"
+            >
+
+            <div class="nav-brand-copy">
+              <span class="nav-brand-kicker">Sistem Kasir</span>
+              <span class="nav-brand-text">Harmoni Agro</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- NAVBAR BAWAH -->
+      <div class="navbar-bottom">
+        <nav class="nav-menu" aria-label="Menu utama">
+
+          <a class="nav-link" href="{% url 'kasir:home' %}">
+            Beranda
+          </a>
+
+          <!-- DROPDOWN TRANSAKSI -->
+          <div class="nav-dropdown">
+            <button type="button" class="nav-link nav-toggle" aria-expanded="false">
+              <span>Transaksi</span>
+              <span class="nav-caret" aria-hidden="true"></span>
+            </button>
+
+            <div class="nav-dropdown-menu nav-dropdown-menu-rich">
+              <a href="{% url 'kasir:transaksi' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+                <span class="nav-item-icon" aria-hidden="true">🧾</span>
+                <span class="nav-item-copy">
+                  <span class="nav-item-title">Penjualan</span>
+                  <span class="nav-item-desc">Input transaksi penjualan</span>
+                </span>
+              </a>
+
+              {% if role == "pemilik" %}
+                <a href="{% url 'kasir:pembelian' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+                  <span class="nav-item-icon" aria-hidden="true">📦</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Pembelian</span>
+                    <span class="nav-item-desc">Kelola transaksi pembelian stok</span>
+                  </span>
+                </a>
+                
+                <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:retur' %}">
+                  <span class="nav-item-icon">↩️</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Retur Pembelian</span>
+                    <span class="nav-item-desc">Barang rusak / tidak sesuai</span>
+                  </span>
+                </a>
+
+                <a class="nav-dropdown-item nav-dropdown-item-rich active" href="{% url 'kasir:pengembalian' %}">
+                  <span class="nav-item-icon" aria-hidden="true">📑</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Riwayat Pengembalian</span>
+                    <span class="nav-item-desc">Hasil retur dari supplier</span>
+                  </span>
+                </a>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- DROPDOWN MASTER DATA -->
+          {% if role == "pemilik" %}
+            <div class="nav-dropdown">
+              <button type="button" class="nav-link nav-toggle active" aria-expanded="false">
+                <span>Master Data</span>
+                <span class="nav-caret" aria-hidden="true"></span>
+              </button>
+
+              <div class="nav-dropdown-menu nav-dropdown-menu-rich">
+
+                <a href="{% url 'kasir:barang' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+                  <span class="nav-item-icon" aria-hidden="true">📋</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Data Barang</span>
+                    <span class="nav-item-desc">Kelola data barang di gudang</span>
+                  </span>
+                </a>
+
+                <a
+                  href="{% url 'kasir:kategori' %}"
+                  class="nav-dropdown-item nav-dropdown-item-rich active"
+                  aria-current="page"
+                >
+                  <span class="nav-item-icon" aria-hidden="true">🏷️</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Data Kategori</span>
+                    <span class="nav-item-desc">Kelola jenis/kategori barang</span>
+                  </span>
+                </a>
+
+                <a href="{% url 'kasir:pembelian' %}#supplier" class="nav-dropdown-item nav-dropdown-item-rich">
+                  <span class="nav-item-icon" aria-hidden="true">🤝</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Data Supplier</span>
+                    <span class="nav-item-desc">Kelola data supplier pembelian</span>
+                  </span>
+                </a>
+
+              </div>
+            </div>
+          {% endif %}
+
+          <a class="nav-link" href="{% url 'kasir:riwayat' %}">
+            Riwayat
+          </a>
+
+          {% if role == "pemilik" %}
+            <a class="nav-link" href="{% url 'kasir:pendapatan' %}">
+              Pendapatan
+            </a>
+
+            <a class="nav-link" href="{% url 'kasir:rekomendasi' %}">
+              Rekomendasi
+            </a>
+          {% endif %}
+
+        </nav>
+
+        <!-- TOMBOL KANAN: DEFAULT SAMA DATA BARANG -->
+        <div class="kategori-nav-tools">
+          <button
+            id="kategoriNavToggle"
+            class="kategori-nav-toggle"
+            type="button"
+            aria-expanded="false"
+            aria-label="Tampilkan atau sembunyikan topbar atas"
+          >
+            Tampilkan Atas
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- =========================
+         CONTENT
+    ========================== -->
+    <main class="main-content-area kategori-page">
+      <section class="content kategori-content">
+
+        <div class="kategori-page-card" role="region" aria-label="Data Kategori">
+          <div class="kategori-page-body">
+
+            <!-- TOOLBAR -->
+            <div class="kategori-toolbar">
+              <input
+                id="kategoriSearch"
+                type="text"
+                placeholder="Cari nama kategori..."
+                autocomplete="off"
+              >
+
+              {% if role == "pemilik" %}
+                <div class="kategori-actions">
+                  <button id="kategoriTambah" class="btn btn-add" type="button">
+                    Tambah Kategori
+                  </button>
+
+                  <button id="kategoriDeleteAll" class="btn btn-danger-soft" type="button">
+                    Hapus Semua
+                  </button>
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- TABLE -->
+            <div class="table-wrap">
+              <table class="table" id="kategoriTable">
+                <thead>
+                  <tr>
+                    <th>ID Kategori</th>
+                    <th>Nama Kategori</th>
+                    <th>Kode Kategori</th>
+                    <th>Jumlah Barang</th>
+
+                    {% if role == "pemilik" %}
+                      <th class="tx-aksi-col">Aksi</th>
+                    {% endif %}
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr>
+                    <td colspan="{% if role == 'pemilik' %}5{% else %}4{% endif %}">
+                      Memuat data kategori...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+          <!-- MODAL EDITOR KATEGORI -->
+          {% if role == "pemilik" %}
+            <div id="kategori-editor-backdrop" aria-hidden="true">
+              <div class="kategori-editor-card" role="dialog" aria-modal="true" aria-label="Form Kategori">
+
+                <div class="kategori-editor-head">
+                  <div>
+                    <div class="kategori-editor-title" id="kategoriEditorTitle">
+                      Tambah Kategori
+                    </div>
+                    <div class="kategori-editor-sub">
+                      Kelola kelompok atau jenis barang
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    class="kategori-editor-close"
+                    data-kategori-editor-close
+                    aria-label="Tutup"
+                  >
+                    ×
+                  </button>
+                </div>
+
+                <form id="kategoriEditorForm" class="kategori-editor-body" novalidate>
+                  <input id="kategoriId" name="id_kategori" type="hidden">
+
+                  <div class="kategori-editor-grid">
+                    <div class="kategori-editor-field full">
+                      <label for="kategoriNama">Nama Kategori</label>
+                      <input
+                        id="kategoriNama"
+                        name="nama_kategori"
+                        type="text"
+                        placeholder="Contoh: FUNGISIDA"
+                        autocomplete="off"
+                        required
+                      >
+                    </div>
+                  </div>
+
+                  <div class="kategori-editor-preview">
+                    <span>Preview nama: <strong id="kategoriNamaPreview">-</strong></span>
+                    <span>kode kategori : <strong id="kategoriPrefixPreview">-</strong></span>
+                  </div>
+
+                  <div class="kategori-editor-actions">
+                    <button type="submit" class="kategori-editor-save" id="kategoriSaveBtn">
+                      Simpan Kategori
+                    </button>
+                  </div>
+                </form>
+
+              </div>
+            </div>
+          {% endif %}
+
+        </div>
+
+      </section>
+    </main>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,1596 @@
+/* =========================================================
+   PEMBELIAN.CSS FINAL FIX
+   - Topbar default bisa disembunyikan dengan pb-top-hidden
+   - Dropdown topbar bisa hover / klik, tidak dobel, tidak susah diklik
+   - Tabel rapi dan teks tengah
+   - Modal pembelian, supplier, detail tampil di atas topbar
+   - Tombol aksi pakai ikon + tooltip
+========================================================= */
+
+*,
+*::before,
+*::after{
+  box-sizing: border-box;
+}
+
+html,
+body{
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body.pb-page,
+body.pembelian-page-body{
+  width: 100vw;
+  min-height: 100vh;
+
+  margin: 0;
+  padding: 0;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  font-family: Arial, sans-serif;
+  color: #1b1b1b;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,0.10),
+      rgba(255,255,255,0.18)
+    ),
+    url("../img/bg_pertanian.png") center bottom / cover no-repeat fixed;
+}
+
+/* =========================================================
+   SHELL
+========================================================= */
+
+body.pb-page .app-shell,
+body.pembelian-page-body .app-shell{
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: visible;
+}
+
+body.pb-page .main-content-area,
+body.pembelian-page-body .main-content-area{
+  flex: 1 1 auto;
+  width: 100%;
+
+  overflow: visible;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,247,253,0.30),
+      rgba(255,252,246,0.38)
+    );
+}
+
+/* =========================================================
+   NAVBAR UTAMA
+========================================================= */
+
+body.pb-page .main-navbar,
+body.pembelian-page-body .main-navbar{
+  position: sticky;
+  top: 0;
+  z-index: 999900;
+
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  background: transparent;
+  box-shadow: 0 10px 24px rgba(52,66,43,0.13);
+
+  overflow: visible !important;
+}
+
+body.pb-page .main-navbar,
+body.pb-page .main-navbar *,
+body.pembelian-page-body .main-navbar,
+body.pembelian-page-body .main-navbar *{
+  box-sizing: border-box;
+}
+
+body.pb-page .main-navbar a,
+body.pembelian-page-body .main-navbar a{
+  color: inherit;
+  text-decoration: none;
+}
+
+body.pb-page .main-navbar button,
+body.pembelian-page-body .main-navbar button{
+  font-family: inherit;
+}
+
+/* =========================================================
+   TOPBAR ATAS
+========================================================= */
+
+body.pb-page .navbar-top,
+body.pembelian-page-body .navbar-top{
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+
+  padding: 12px 36px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #ffffff 0%,
+      #ffffff 22%,
+      #f9f8ef 32%,
+      #d0d8cb 47%,
+      rgba(168,178,154,0.84) 70%,
+      #98a88c 100%
+    );
+
+  border-bottom: 1px solid rgba(85,102,68,0.18);
+  backdrop-filter: blur(14px);
+
+  overflow: visible !important;
+}
+
+/* Default hidden jika body punya pb-top-hidden */
+body.pb-page.pb-top-hidden .navbar-top,
+body.pembelian-page-body.pb-top-hidden .navbar-top,
+body.pb-page.top-hidden .navbar-top,
+body.pembelian-page-body.top-hidden .navbar-top{
+  display: none !important;
+}
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+body.pb-page .nav-brand-wrap,
+body.pembelian-page-body .nav-brand-wrap{
+  min-width: 0;
+}
+
+body.pb-page .nav-brand,
+body.pembelian-page-body .nav-brand{
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+
+  color: inherit;
+  text-decoration: none;
+}
+
+body.pb-page .nav-brand-logo,
+body.pembelian-page-body .nav-brand-logo{
+  width: 66px;
+  height: 66px;
+  min-width: 66px;
+  min-height: 66px;
+  max-width: 66px;
+  max-height: 66px;
+
+  object-fit: contain;
+
+  border-radius: 999px;
+  padding: 7px;
+
+  background:
+    radial-gradient(circle at 32% 24%, rgba(255,255,255,0.76), rgba(142,69,17,0) 80%),
+    linear-gradient(180deg, #ffe8b3 30%, #dfb864 100%);
+
+  border: 1px solid rgba(152,107,30,0.25);
+  box-shadow: 0 9px 19px rgba(86,61,20,0.14);
+
+  flex: 0 0 auto;
+}
+
+body.pb-page .nav-brand-copy,
+body.pembelian-page-body .nav-brand-copy{
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  min-width: 0;
+}
+
+body.pb-page .nav-brand-kicker,
+body.pembelian-page-body .nav-brand-kicker{
+  display: block;
+
+  font-size: 12px;
+  line-height: 1.15;
+  font-weight: 800;
+
+  color: #6e4b24;
+  letter-spacing: 0.25px;
+}
+
+body.pb-page .nav-brand-text,
+body.pembelian-page-body .nav-brand-text{
+  display: block;
+
+  font-size: 27px;
+  line-height: 1.05;
+  font-weight: 900;
+
+  color: #4a2f14;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   TOPBAR BAWAH
+========================================================= */
+
+body.pb-page .navbar-bottom,
+body.pembelian-page-body .navbar-bottom{
+  position: relative;
+  z-index: 999910;
+
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+
+  padding: 6px 36px;
+
+  background:
+    radial-gradient(circle at 14% 10%, rgba(255,255,255,0.36), rgba(255,255,255,0) 28%),
+    linear-gradient(
+      90deg,
+      #ffdf9f 0%,
+      #ffe9b3 42%,
+      #e8bd60 100%
+    );
+
+  border-bottom: 1px solid rgba(132,87,24,0.18);
+  box-shadow: 0 8px 18px rgba(108,76,28,0.10);
+  backdrop-filter: blur(12px);
+
+  overflow: visible !important;
+}
+
+/* =========================================================
+   NAV MENU
+========================================================= */
+
+body.pb-page .nav-menu,
+body.pembelian-page-body .nav-menu{
+  position: relative;
+  z-index: 999920;
+
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 4px;
+
+  margin: 0;
+  padding: 0;
+
+  overflow: visible !important;
+}
+
+body.pb-page .nav-dropdown,
+body.pembelian-page-body .nav-dropdown{
+  position: relative;
+  z-index: 999930;
+
+  display: inline-flex;
+  width: auto;
+
+  overflow: visible !important;
+}
+
+body.pb-page .nav-dropdown.open,
+body.pb-page .nav-dropdown:hover,
+body.pembelian-page-body .nav-dropdown.open,
+body.pembelian-page-body .nav-dropdown:hover{
+  z-index: 999950;
+}
+
+body.pb-page .nav-link,
+body.pb-page .nav-toggle,
+body.pembelian-page-body .nav-link,
+body.pembelian-page-body .nav-toggle{
+  width: auto;
+  height: 37px;
+  min-height: 37px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  padding: 0 14px;
+
+  border: none;
+  border-radius: 13px;
+
+  background: transparent;
+  color: #202020;
+
+  font-size: 13.5px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.1px;
+  white-space: nowrap;
+
+  cursor: pointer;
+  text-decoration: none;
+
+  transition:
+    background .18s ease,
+    color .18s ease,
+    box-shadow .18s ease,
+    transform .18s ease;
+}
+
+body.pb-page .nav-link:hover,
+body.pb-page .nav-toggle:hover,
+body.pb-page .nav-dropdown:hover > .nav-toggle,
+body.pembelian-page-body .nav-link:hover,
+body.pembelian-page-body .nav-toggle:hover,
+body.pembelian-page-body .nav-dropdown:hover > .nav-toggle{
+  background:
+    radial-gradient(circle at 24% 18%, rgba(255,255,255,0.78), rgba(255,255,255,0) 42%),
+    linear-gradient(180deg, #f9fcf6 0%, #dcebd2 100%);
+
+  color: #111;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(97,125,76,0.16),
+    0 5px 12px rgba(69,95,57,0.08);
+}
+
+body.pb-page .nav-link.active,
+body.pb-page .nav-toggle.active,
+body.pb-page .nav-dropdown.open > .nav-toggle,
+body.pb-page .nav-dropdown:hover > .nav-toggle,
+body.pembelian-page-body .nav-link.active,
+body.pembelian-page-body .nav-toggle.active,
+body.pembelian-page-body .nav-dropdown.open > .nav-toggle,
+body.pembelian-page-body .nav-dropdown:hover > .nav-toggle{
+  background:
+    radial-gradient(circle at 24% 18%, rgba(255,255,255,0.84), rgba(255,255,255,0) 42%),
+    linear-gradient(180deg, #f8fcf5 0%, #cfe5c4 100%);
+
+  color: #111;
+
+  box-shadow:
+    inset 0 0 0 1px rgba(96,126,75,0.22),
+    0 7px 14px rgba(69,95,57,0.12);
+}
+
+/* =========================================================
+   CARET
+========================================================= */
+
+body.pb-page .nav-caret,
+body.pembelian-page-body .nav-caret{
+  width: 7px;
+  height: 7px;
+
+  display: inline-block;
+
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+
+  transform: rotate(45deg) translateY(-2px);
+  transform-origin: center;
+
+  opacity: .85;
+  margin-left: 2px;
+
+  transition:
+    transform .18s ease,
+    opacity .18s ease;
+}
+
+body.pb-page .nav-dropdown.open > .nav-toggle .nav-caret,
+body.pb-page .nav-dropdown:hover > .nav-toggle .nav-caret,
+body.pembelian-page-body .nav-dropdown.open > .nav-toggle .nav-caret,
+body.pembelian-page-body .nav-dropdown:hover > .nav-toggle .nav-caret{
+  transform: rotate(-135deg) translateY(-1px);
+  opacity: 1;
+}
+
+/* =========================================================
+   DROPDOWN TOPBAR FINAL
+   Penting:
+   - top: 100% supaya tidak ada gap kosong
+   - gap kosong bisa bikin hover putus dan link harus diklik berkali-kali
+========================================================= */
+
+body.pb-page .nav-dropdown-menu,
+body.pembelian-page-body .nav-dropdown-menu{
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+
+  min-width: 255px !important;
+  width: max-content !important;
+  max-width: 340px !important;
+
+  display: none !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+
+  margin-top: 0 !important;
+  padding: 8px !important;
+
+  border-radius: 0 0 18px 18px !important;
+
+  background: #fffefb !important;
+  border: 1px solid rgba(166,130,62,0.16) !important;
+  box-shadow: 0 20px 42px rgba(82,62,24,0.18) !important;
+
+  z-index: 9999999 !important;
+
+  pointer-events: auto !important;
+  overflow: visible !important;
+}
+
+body.pb-page .nav-dropdown.open > .nav-dropdown-menu,
+body.pb-page .nav-dropdown:hover > .nav-dropdown-menu,
+body.pembelian-page-body .nav-dropdown.open > .nav-dropdown-menu,
+body.pembelian-page-body .nav-dropdown:hover > .nav-dropdown-menu{
+  display: flex !important;
+}
+
+body.pb-page .nav-menu:has(.nav-dropdown:hover) .nav-dropdown.open:not(:hover) > .nav-dropdown-menu,
+body.pembelian-page-body .nav-menu:has(.nav-dropdown:hover) .nav-dropdown.open:not(:hover) > .nav-dropdown-menu{
+  display: none !important;
+}
+
+body.pb-page .nav-menu:has(.nav-dropdown:hover) .nav-dropdown.open:not(:hover) > .nav-toggle,
+body.pembelian-page-body .nav-menu:has(.nav-dropdown:hover) .nav-dropdown.open:not(:hover) > .nav-toggle{
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body.pb-page .nav-menu:has(.nav-dropdown:hover) .nav-dropdown.open:not(:hover) > .nav-toggle .nav-caret,
+body.pembelian-page-body .nav-menu:has(.nav-dropdown:hover) .nav-dropdown.open:not(:hover) > .nav-toggle .nav-caret{
+  transform: rotate(45deg) translateY(-2px) !important;
+  opacity: .85 !important;
+}
+
+body.pb-page .nav-dropdown-item,
+body.pb-page .nav-dropdown-item:visited,
+body.pembelian-page-body .nav-dropdown-item,
+body.pembelian-page-body .nav-dropdown-item:visited{
+  color: #202020 !important;
+  text-decoration: none !important;
+}
+
+body.pb-page .nav-dropdown-item-rich,
+body.pembelian-page-body .nav-dropdown-item-rich{
+  position: relative !important;
+  z-index: 10000000 !important;
+
+  width: 100% !important;
+  min-height: 42px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+
+  padding: 10px 12px !important;
+
+  border-radius: 13px !important;
+
+  background: transparent !important;
+  color: #202020 !important;
+
+  pointer-events: auto !important;
+  cursor: pointer !important;
+
+  transition:
+    background .18s ease,
+    transform .18s ease,
+    box-shadow .18s ease;
+}
+
+body.pb-page .nav-dropdown-item-rich *,
+body.pembelian-page-body .nav-dropdown-item-rich *{
+  pointer-events: none !important;
+}
+
+body.pb-page .nav-dropdown-item-rich:hover,
+body.pb-page .nav-dropdown-item-rich.active,
+body.pembelian-page-body .nav-dropdown-item-rich:hover,
+body.pembelian-page-body .nav-dropdown-item-rich.active{
+  background:
+    radial-gradient(circle at 18% 16%, rgba(255,255,255,0.68), rgba(255,255,255,0) 38%),
+    linear-gradient(90deg, #dadfd4 0%, #e3f0dc 100%) !important;
+
+  box-shadow: inset 0 0 0 1px rgba(112,143,91,0.12) !important;
+  transform: none !important;
+}
+
+/* =========================================================
+   IKON DROPDOWN
+========================================================= */
+
+body.pb-page .nav-item-icon,
+body.pembelian-page-body .nav-item-icon{
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  min-height: 26px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+
+  color: #2c3f2d;
+
+  font-size: 16px;
+  line-height: 1;
+
+  flex: 0 0 auto;
+}
+
+body.pb-page .nav-svg,
+body.pembelian-page-body .nav-svg{
+  width: 19px;
+  height: 19px;
+
+  display: block;
+
+  stroke: currentColor;
+  color: inherit;
+}
+
+body.pb-page .nav-dropdown-item-rich:hover .nav-item-icon,
+body.pb-page .nav-dropdown-item-rich.active .nav-item-icon,
+body.pembelian-page-body .nav-dropdown-item-rich:hover .nav-item-icon,
+body.pembelian-page-body .nav-dropdown-item-rich.active .nav-item-icon{
+  color: #1f4f24;
+}
+
+body.pb-page .nav-item-copy,
+body.pembelian-page-body .nav-item-copy{
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+
+  min-width: 0;
+}
+
+body.pb-page .nav-item-title,
+body.pembelian-page-body .nav-item-title{
+  display: block;
+
+  font-size: 12.3px;
+  font-weight: 900;
+  line-height: 1.02;
+
+  color: #202020;
+  white-space: nowrap;
+}
+
+body.pb-page .nav-item-desc,
+body.pembelian-page-body .nav-item-desc{
+  display: block;
+
+  margin-top: 2px;
+
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1.08;
+
+  color: #4f4f4f;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   TOMBOL TAMPILKAN / SEMBUNYIKAN ATAS
+========================================================= */
+
+body.pb-page .pb-nav-tools,
+body.pembelian-page-body .pb-nav-tools{
+  margin-left: auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  flex: 0 0 auto;
+}
+
+body.pb-page .pb-nav-toggle,
+body.pb-page .btn-hide-top,
+body.pb-page #btnToggleTop,
+body.pembelian-page-body .pb-nav-toggle,
+body.pembelian-page-body .btn-hide-top,
+body.pembelian-page-body #btnToggleTop{
+  position: relative;
+  z-index: 10000000;
+
+  height: 37px;
+  min-height: 37px;
+  min-width: 134px;
+
+  padding: 0 18px;
+
+  border-radius: 15px;
+  border: 1px solid rgba(142,101,32,0.18);
+
+  background: #ffffff;
+  color: #171717;
+
+  font-size: 12.5px;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+
+  cursor: pointer;
+  pointer-events: auto;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 7px 14px rgba(0,0,0,0.10);
+}
+
+body.pb-page .pb-nav-toggle:hover,
+body.pb-page .btn-hide-top:hover,
+body.pb-page #btnToggleTop:hover,
+body.pembelian-page-body .pb-nav-toggle:hover,
+body.pembelian-page-body .btn-hide-top:hover,
+body.pembelian-page-body #btnToggleTop:hover{
+  background: #fffaf0;
+}
+
+/* =========================================================
+   CONTENT PEMBELIAN
+========================================================= */
+
+.pb-wrap{
+  width: min(1500px, calc(100% - 58px));
+  margin: 0 auto;
+  padding: 22px 0 42px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pb-top-actions{
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  margin: 0;
+}
+
+.pb-btn{
+  height: 42px;
+
+  padding: 0 16px;
+
+  border-radius: 13px;
+  border: 1px solid rgba(0,0,0,.12);
+
+  cursor: pointer;
+
+  font-size: 13px;
+  font-weight: 900;
+  white-space: nowrap;
+
+  background: #fff;
+  color: #222;
+
+  box-shadow: 0 8px 14px rgba(0,0,0,0.08);
+}
+
+.pb-btn:hover{
+  filter: brightness(.98);
+}
+
+.pb-btn-primary{
+  background: #2f6c33;
+  color: #fff;
+}
+
+.pb-btn-warn{
+  background: linear-gradient(180deg, #d8a53b 0%, #b98413 100%);
+  color: #fff;
+}
+
+.pb-btn-danger{
+  background: #fff1f1;
+  color: #9b1c1c;
+  border: 1px solid rgba(155,28,28,0.18);
+}
+
+.pb-btn-danger:hover{
+  background: #ffe5e5;
+}
+
+.pb-card{
+  background:
+    radial-gradient(120px 60px at 18% 22%, rgba(255,255,255,0.92), rgba(255,255,255,0) 60%),
+    radial-gradient(140px 70px at 62% 30%, rgba(255,255,255,0.88), rgba(255,255,255,0) 62%),
+    rgba(255,255,255,0.80);
+
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 20px;
+
+  padding: 16px;
+
+  box-shadow: 0 12px 26px rgba(0,0,0,.08);
+  backdrop-filter: blur(7px);
+}
+
+/* =========================================================
+   TABEL
+========================================================= */
+
+.pb-table-wrap{
+  overflow: auto;
+
+  border-radius: 16px;
+  background: #fff;
+}
+
+.pb-table{
+  width: 100%;
+  min-width: 900px;
+
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.pb-table th,
+.pb-table td{
+  padding: 13px 14px;
+
+  border-bottom: 1px solid rgba(0,0,0,.08);
+  border-right: 1px solid rgba(0,0,0,.12);
+
+  text-align: center !important;
+  vertical-align: middle !important;
+
+  font-size: 13px;
+}
+
+.pb-table th:last-child,
+.pb-table td:last-child{
+  border-right: none;
+}
+
+.pb-table th{
+  background: #f7f4ef;
+
+  color: rgba(0,0,0,0.68);
+
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.pb-table td{
+  color: #2f2b26;
+  font-weight: 700;
+}
+
+.pb-table tbody tr:hover td{
+  background: #fcfaf7;
+}
+
+.pb-table td.num,
+.pb-table th.num{
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+.pb-aksi-col{
+  text-align: center !important;
+  width: 130px;
+  min-width: 130px;
+}
+
+#pembelianTable thead th,
+#pembelianTable tbody td,
+#supplierTable thead th,
+#supplierTable tbody td{
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+/* Alamat tetap kiri agar mudah dibaca */
+.pb-address-cell{
+  min-width: 280px;
+  max-width: 420px;
+
+  text-align: left !important;
+
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  line-height: 1.35 !important;
+
+  color: #0f172a !important;
+
+  white-space: normal !important;
+  word-break: normal !important;
+}
+
+.pb-address-cell .alamat-line{
+  display: block;
+  line-height: 1.25;
+  margin-bottom: 3px;
+}
+
+.pb-address-cell .alamat-detail{
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .1px;
+}
+
+.pb-address-cell .alamat-wilayah{
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: .35px;
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   BADGE STATUS
+========================================================= */
+
+.pb-badge{
+  display: inline-block;
+
+  padding: 6px 10px;
+
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.pb-badge.dipesan{
+  background: #fff4d6;
+  color: #9a6700;
+}
+
+.pb-badge.diterima{
+  background: #e8f7ea;
+  color: #1f6d31;
+}
+
+.pb-badge.dibatalkan{
+  background: #ffe5e5;
+  color: #9b1c1c;
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+body.modal-open{
+  overflow: hidden !important;
+}
+
+.pb-modal{
+  position: fixed;
+  inset: 0;
+
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  padding: 18px;
+
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(4px);
+
+  z-index: 2147483000;
+}
+
+.pb-modal.show{
+  display: flex !important;
+}
+
+.pb-modal-card{
+  position: relative;
+
+  width: min(1000px, calc(100vw - 36px));
+  max-height: calc(100vh - 36px);
+
+  overflow: auto;
+
+  background: #fff;
+
+  border-radius: 20px;
+  border: 1px solid rgba(0,0,0,0.08);
+
+  padding: 18px;
+
+  box-shadow: 0 24px 48px rgba(0,0,0,0.22);
+}
+
+.pb-modal-head{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+
+  margin-bottom: 14px;
+}
+
+.pb-modal-head h2,
+.pb-modal-head h3{
+  margin: 0;
+
+  font-size: 18px;
+  font-weight: 900;
+  color: #2f2b26;
+}
+
+.pb-x{
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: #f3f3f3;
+  color: #111;
+
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.pb-x:hover{
+  background: #ededed;
+}
+
+/* =========================================================
+   FORM MODAL
+========================================================= */
+
+.pb-grid,
+.pb-supplier-form{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.pb-field{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pb-field label{
+  font-size: 12px;
+  font-weight: 900;
+  color: #475569;
+}
+
+.pb-field-full{
+  grid-column: 1 / -1;
+}
+
+.pb-field input,
+.pb-field select,
+.pb-field textarea{
+  width: 100%;
+
+  height: 42px;
+
+  border: 1px solid rgba(0,0,0,.12);
+  border-radius: 12px;
+
+  padding: 10px 12px;
+
+  font-size: 13px;
+  font-weight: 750;
+
+  box-sizing: border-box;
+  outline: none;
+
+  background: #fff;
+  color: #1e293b;
+}
+
+.pb-field input[readonly]{
+  background: #f8fafc;
+  color: #475569;
+  cursor: default;
+}
+
+.pb-field textarea{
+  height: 90px;
+  resize: vertical;
+}
+
+.pb-field input:focus,
+.pb-field select:focus,
+.pb-field textarea:focus{
+  border-color: rgba(47,108,51,0.35);
+  box-shadow: 0 0 0 4px rgba(47,108,51,0.12);
+}
+
+.pb-supplier-auto-field input{
+  font-weight: 900;
+  color: #1f3b22;
+  background: #eef8ef;
+  border-color: rgba(47,108,51,.16);
+}
+
+.pb-detail-add{
+  display: grid;
+  grid-template-columns: 2fr 120px 160px 120px;
+  gap: 10px;
+  align-items: end;
+
+  margin: 14px 0;
+}
+
+.pb-btn-add{
+  align-self: end;
+}
+
+/* =========================================================
+   DETAIL TABLE
+========================================================= */
+
+.pb-detail-table{
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.pb-detail-table th,
+.pb-detail-table td{
+  padding: 10px;
+
+  border-bottom: 1px solid rgba(0,0,0,.08);
+  border-right: 1px solid rgba(0,0,0,.12);
+
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+.pb-detail-table th:last-child,
+.pb-detail-table td:last-child{
+  border-right: none;
+}
+
+.pb-detail-table th{
+  background: #f7f7f7;
+
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.pb-actions-end{
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.pb-actions-gap{
+  margin-bottom: 16px;
+}
+
+.pb-total-box{
+  margin-right: auto;
+
+  font-size: 14px;
+  font-weight: 900;
+  color: #2f2b26;
+}
+
+#supplierKabKota,
+#supplierKecamatan,
+#supplierDesa{
+  position: relative;
+  z-index: 1;
+}
+
+#supplierKabKota option,
+#supplierKecamatan option,
+#supplierDesa option{
+  font-size: 14px;
+  padding: 8px;
+}
+
+/* =========================================================
+   SUPPLIER LABEL DALAM ITEM
+========================================================= */
+
+.pb-supplier-item-label{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  max-width: 240px;
+  padding: 7px 10px;
+
+  border-radius: 999px;
+  background: #eef8ef;
+  border: 1px solid rgba(47, 108, 51, .16);
+
+  color: #1f3b22;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.3;
+
+  white-space: normal;
+  text-align: center;
+}
+
+/* =========================================================
+   TOMBOL AKSI IKON
+========================================================= */
+
+.pb-action-buttons,
+.pb-icon-actions{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.pb-icon-action,
+.pb-icon-btn{
+  position: relative;
+
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border-radius: 13px;
+  border: 1px solid rgba(0,0,0,.12);
+
+  background: #fff;
+  color: #1f2937;
+
+  cursor: pointer;
+
+  box-shadow: 0 7px 14px rgba(0,0,0,0.08);
+
+  transition:
+    transform .16s ease,
+    box-shadow .16s ease,
+    background .16s ease,
+    border-color .16s ease;
+}
+
+.pb-icon-action svg,
+.pb-action-svg{
+  width: 19px;
+  height: 19px;
+  display: block;
+}
+
+.pb-icon-action:hover,
+.pb-icon-btn:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 9px 18px rgba(0,0,0,0.10);
+}
+
+/* Detail */
+.pb-icon-detail{
+  background: #f8fafc;
+  color: #334155;
+  border-color: #e2e8f0;
+}
+
+.pb-icon-detail:hover{
+  background: #eef2ff;
+  color: #3730a3;
+  border-color: #c7d2fe;
+}
+
+/* Terima */
+.pb-icon-terima{
+  background: #eaf7ec;
+  color: #20672a;
+  border-color: rgba(32,103,42,.18);
+}
+
+.pb-icon-terima:hover{
+  background: #d9f2de;
+  color: #14532d;
+}
+
+/* Edit */
+.pb-edit-btn{
+  color: #2563eb;
+  background: #eff6ff;
+  border-color: rgba(37,99,235,.18);
+}
+
+.pb-edit-btn:hover{
+  background: #dbeafe;
+  border-color: rgba(37,99,235,.28);
+}
+
+/* Hapus */
+.pb-icon-hapus,
+.pb-delete-btn{
+  color: #991b1b;
+  background: #fff1f2;
+  border-color: rgba(185,28,28,.16);
+}
+
+.pb-icon-hapus:hover,
+.pb-delete-btn:hover{
+  background: #fee2e2;
+  color: #7f1d1d;
+  border-color: rgba(185,28,28,.28);
+}
+
+/* Tooltip icon button */
+.pb-icon-btn::after,
+.pb-icon-action::after{
+  content: attr(data-tooltip);
+
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+
+  transform: translateX(-50%) translateY(4px);
+
+  background: rgba(24,24,27,.96);
+  color: #fff;
+
+  font-size: 11.5px;
+  font-weight: 800;
+  line-height: 1;
+
+  padding: 7px 9px;
+
+  border-radius: 8px;
+
+  white-space: nowrap;
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transition:
+    opacity .18s ease,
+    visibility .18s ease,
+    transform .18s ease;
+
+  z-index: 999999;
+}
+
+.pb-icon-btn::before,
+.pb-icon-action::before{
+  content: "";
+
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+
+  transform: translateX(-50%) translateY(4px);
+
+  border-width: 6px;
+  border-style: solid;
+  border-color: rgba(24,24,27,.96) transparent transparent transparent;
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transition:
+    opacity .18s ease,
+    visibility .18s ease,
+    transform .18s ease;
+
+  z-index: 999998;
+}
+
+.pb-icon-btn:hover::after,
+.pb-icon-btn:hover::before,
+.pb-icon-btn:focus-visible::after,
+.pb-icon-btn:focus-visible::before,
+.pb-icon-action:hover::after,
+.pb-icon-action:hover::before,
+.pb-icon-action:focus-visible::after,
+.pb-icon-action:focus-visible::before{
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* =========================================================
+   DETAIL MODAL
+========================================================= */
+
+.pb-detail-card{
+  width: min(1080px, calc(100vw - 44px));
+  max-height: 88vh;
+}
+
+.pb-detail-subtitle{
+  margin: 5px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pb-detail-summary{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+
+  margin: 14px 0 18px;
+}
+
+.pb-detail-box{
+  padding: 14px 15px;
+
+  border-radius: 16px;
+  border: 1px solid rgba(47,108,51,.14);
+
+  background:
+    radial-gradient(circle at 20% 10%, rgba(255,255,255,.9), rgba(255,255,255,0) 45%),
+    #f5fbf6;
+
+  text-align: center;
+}
+
+.pb-detail-box span{
+  display: block;
+  margin-bottom: 6px;
+
+  font-size: 12px;
+  font-weight: 900;
+  color: #64748b;
+  letter-spacing: .2px;
+}
+
+.pb-detail-box strong{
+  display: block;
+
+  font-size: 15px;
+  font-weight: 900;
+  color: #17231a;
+  line-height: 1.35;
+}
+
+.pb-detail-table-wrap{
+  max-height: 320px;
+  overflow: auto;
+  border-radius: 16px;
+}
+
+.pb-detail-footer{
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+/* =========================================================
+   INFO REKOMENDASI
+========================================================= */
+
+.pb-info-rekomendasi{
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  margin: 12px 0 14px;
+  padding: 12px 14px;
+
+  border-radius: 14px;
+  border: 1px solid rgba(47,108,51,0.16);
+  background: #f0f9f2;
+
+  color: #173d1d;
+}
+
+.pb-info-rekomendasi strong{
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.pb-info-rekomendasi span{
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+/* =========================================================
+   PATCH FINAL: ALAMAT SUPPLIER RATA KIRI
+========================================================= */
+body.pb-page #supplierBody tr td:nth-child(4),
+body.pembelian-page-body #supplierBody tr td:nth-child(4),
+body.pb-page #supplierTable tbody tr td:nth-child(4),
+body.pembelian-page-body #supplierTable tbody tr td:nth-child(4){
+  text-align: left !important;
+  vertical-align: middle !important;
+
+  padding-left: 28px !important;
+  padding-right: 24px !important;
+
+  line-height: 1.55 !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+}
+
+body.pb-page #supplierBody tr td:nth-child(4) *,
+body.pembelian-page-body #supplierBody tr td:nth-child(4) *,
+body.pb-page #supplierTable tbody tr td:nth-child(4) *,
+body.pembelian-page-body #supplierTable tbody tr td:nth-child(4) *{
+  text-align: left !important;
+}
+
+body.pb-page #supplierTable thead tr th:nth-child(4),
+body.pembelian-page-body #supplierTable thead tr th:nth-child(4){
+  text-align: center !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px){
+  body.pb-page .navbar-top,
+  body.pembelian-page-body .navbar-top{
+    padding: 10px 18px;
+  }
+
+  body.pb-page .navbar-bottom,
+  body.pembelian-page-body .navbar-bottom{
+    gap: 12px;
+    padding: 7px 18px;
+  }
+
+  body.pb-page .nav-brand-logo,
+  body.pembelian-page-body .nav-brand-logo{
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    min-height: 50px;
+  }
+
+  body.pb-page .nav-brand-kicker,
+  body.pembelian-page-body .nav-brand-kicker{
+    font-size: 10.5px;
+  }
+
+  body.pb-page .nav-brand-text,
+  body.pembelian-page-body .nav-brand-text{
+    font-size: 22px;
+  }
+
+  body.pb-page .nav-link,
+  body.pb-page .nav-toggle,
+  body.pembelian-page-body .nav-link,
+  body.pembelian-page-body .nav-toggle{
+    height: 36px;
+    min-height: 36px;
+
+    padding: 0 11px;
+
+    font-size: 12.5px;
+    border-radius: 12px;
+  }
+
+  .pb-wrap{
+    width: calc(100% - 28px);
+    padding: 18px 0 28px;
+  }
+}
+
+@media (max-width: 768px){
+  body.pb-page .navbar-bottom,
+  body.pembelian-page-body .navbar-bottom{
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+  }
+
+  body.pb-page .nav-menu,
+  body.pembelian-page-body .nav-menu{
+    width: max-content;
+    min-width: max-content;
+    flex: 1 0 auto;
+  }
+
+  .pb-wrap{
+    width: calc(100% - 16px);
+    padding: 14px 0 22px;
+  }
+
+  .pb-grid,
+  .pb-supplier-form,
+  .pb-detail-add{
+    grid-template-columns: 1fr;
+  }
+
+  .pb-top-actions{
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .pb-btn{
+    width: 100%;
+  }
+
+  .pb-card{
+    padding: 12px;
+  }
+
+  .pb-modal{
+    padding: 9px;
+  }
+
+  .pb-modal-card{
+    width: min(100%, calc(100vw - 18px));
+    max-height: calc(100vh - 18px);
+
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .pb-actions-end{
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .pb-total-box{
+    margin-right: 0;
+  }
+
+  .pb-detail-summary{
+    grid-template-columns: 1fr;
+  }
+
+  .pb-action-buttons,
+  .pb-icon-actions{
+    gap: 6px;
+  }
+
+  .pb-icon-action,
+  .pb-icon-btn{
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+  }
+}

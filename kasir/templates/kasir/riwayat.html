@@ -1,0 +1,591 @@
+{% load static %}
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Riwayat - Sistem Kasir Harmoni Agro</title>
+
+  <link rel="stylesheet" href="{% static 'kasir/css/riwayat.css' %}?v=riwayatBesaran111">
+  <script src="{% static 'kasir/js/riwayat.js' %}?v=riwayatBesaran01" defer></script>
+</head>
+
+<body
+  class="riwayat-page-body topbar-hidden"
+  data-role="{{ role|default:'' }}"
+  data-riwayat-detail-base="{% url 'kasir:riwayat_detail' 0 %}"
+  data-riwayat-bulanan-base="{% url 'kasir:riwayat_bulanan_detail' 2000 1 %}"
+>
+  <div class="app-shell">
+
+    <header class="main-navbar">
+      <div class="navbar-top">
+        <div class="nav-brand-wrap">
+          <a href="{% url 'kasir:home' %}" class="nav-brand">
+            <img
+              src="{% static 'kasir/img/logo_pertanian.png' %}"
+              alt="Toko Pertanian Harmoni Agro"
+              class="nav-brand-logo"
+            >
+
+            <div class="nav-brand-copy">
+              <span class="nav-brand-kicker">Sistem Kasir</span>
+              <span class="nav-brand-text">Harmoni Agro</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="navbar-bottom">
+        <nav class="nav-menu" aria-label="Menu utama">
+          <a class="nav-link" href="{% url 'kasir:home' %}">
+            Beranda
+          </a>
+
+          <div class="nav-dropdown">
+            <button type="button" class="nav-link nav-toggle" aria-expanded="false">
+              <span>Transaksi</span>
+              <span class="nav-caret" aria-hidden="true"></span>
+            </button>
+
+            <div class="nav-dropdown-menu nav-dropdown-menu-rich">
+              <a href="{% url 'kasir:transaksi' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+                <span class="nav-item-icon" aria-hidden="true">🧾</span>
+                <span class="nav-item-copy">
+                  <span class="nav-item-title">Penjualan</span>
+                  <span class="nav-item-desc">Mulai transaksi penjualan barang</span>
+                </span>
+              </a>
+
+              {% if role == "pemilik" %}
+                <a href="{% url 'kasir:pembelian' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+                  <span class="nav-item-icon" aria-hidden="true">📦</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Pembelian</span>
+                    <span class="nav-item-desc">Kelola transaksi pembelian stok</span>
+                  </span>
+                </a>
+                
+                <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:retur' %}">
+                  <span class="nav-item-icon">↩️</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Retur Pembelian</span>
+                    <span class="nav-item-desc">Barang rusak / tidak sesuai</span>
+                  </span>
+                </a>
+
+                <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:pengembalian' %}">
+                  <span class="nav-item-icon" aria-hidden="true">📑</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Riwayat Pengembalian</span>
+                    <span class="nav-item-desc">Hasil retur dari supplier</span>
+                  </span>
+                </a>
+              {% endif %}
+            </div>
+          </div>
+
+          {% if role == "pemilik" %}
+            <div class="nav-dropdown">
+              <button type="button" class="nav-link nav-toggle" aria-expanded="false">
+                <span>Master Data</span>
+                <span class="nav-caret" aria-hidden="true"></span>
+              </button>
+
+              <div class="nav-dropdown-menu nav-dropdown-menu-rich">
+                <a href="{% url 'kasir:barang' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+                  <span class="nav-item-icon" aria-hidden="true">📋</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Data Barang</span>
+                    <span class="nav-item-desc">Kelola data barang</span>
+                  </span>
+                </a>
+
+                <a href="{% url 'kasir:kategori' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+                  <span class="nav-item-icon" aria-hidden="true">🏷️</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Data Kategori</span>
+                    <span class="nav-item-desc">Kelola kategori barang</span>
+                  </span>
+                </a>
+
+                <a href="{% url 'kasir:pembelian' %}#supplier" class="nav-dropdown-item nav-dropdown-item-rich">
+                  <span class="nav-item-icon" aria-hidden="true">🤝</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Data Supplier</span>
+                    <span class="nav-item-desc">Lihat dan kelola supplier pembelian</span>
+                  </span>
+                </a>
+              </div>
+            </div>
+          {% endif %}
+
+          <a class="nav-link active" href="{% url 'kasir:riwayat' %}">
+            Riwayat
+          </a>
+
+          {% if role == "pemilik" %}
+            <a class="nav-link" href="{% url 'kasir:pendapatan' %}">
+              Pendapatan
+            </a>
+
+            <a class="nav-link" href="{% url 'kasir:rekomendasi' %}">
+              Rekomendasi
+            </a>
+          {% endif %}
+        </nav>
+
+        <button type="button" class="top-toggle-btn" data-topbar-toggle>
+          Tampilkan Atas
+        </button>
+      </div>
+    </header>
+
+    <main class="main-content-area">
+      <section class="content-riwayat">
+
+        <div class="riwayat-tab-row">
+          <div class="aksi-topbar">
+            {% if role == "pemilik" %}
+              <a
+                href="?tampilan=harian"
+                class="tombol-tab {% if tampilan != 'bulanan' %}aktif{% endif %}"
+              >
+                Transaksi Harian
+              </a>
+
+              <a
+                href="?tampilan=bulanan"
+                class="tombol-tab {% if tampilan == 'bulanan' %}aktif{% endif %}"
+              >
+                Penjualan Bulanan
+              </a>
+            {% else %}
+              <span class="tombol-tab aktif tombol-tab-static">
+                Transaksi Harian
+              </span>
+            {% endif %}
+          </div>
+        </div>
+
+        {% if role == "pemilik" and tampilan == "bulanan" %}
+          <section class="card cloud kartu-riwayat">
+            <div class="card-head riwayat-card-head-action">
+              <div class="card-title-lg">Ringkasan Penjualan Bulanan</div>
+
+              <a
+                href="{% url 'kasir:download_riwayat_bulanan' %}?tahun={{ tahun_filter_bulanan|default:'' }}"
+                class="btn-download-bulanan"
+              >
+                Download Riwayat Bulanan
+              </a>
+            </div>
+
+            <form method="get" id="formFilterBulanan">
+              <input type="hidden" name="tampilan" value="bulanan">
+
+              <div class="baris-filter">
+                <div class="kotak-filter kotak-filter-has-select">
+                  <span class="label-info">Tahun:</span>
+
+                  <select class="select-kasir" id="selectTahunBulanan" name="tahun">
+                    <option value="">Semua Tahun</option>
+
+                    {% for th in daftar_tahun_bulanan %}
+                      <option
+                        value="{{ th }}"
+                        {% if tahun_filter_bulanan|stringformat:"s" == th|stringformat:"s" %}selected{% endif %}
+                      >
+                        {{ th }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="kotak-filter">
+                  <span class="label-info">Jumlah Bulan:</span>
+                  <span class="nilai-info">{{ jumlah_bulan_terfilter|default:"0" }}</span>
+                </div>
+
+                <div class="kotak-filter">
+                  <span class="label-info">Jumlah Transaksi:</span>
+                  <span class="nilai-info">{{ jumlah_transaksi_bulanan_total|default:"0" }}</span>
+                </div>
+
+                <div class="kotak-filter">
+                  <span class="label-info">Total Penjualan:</span>
+                  <span class="nilai-info">{{ total_penjualan_bulanan_total|default:"Rp 0" }}</span>
+                </div>
+              </div>
+            </form>
+
+            <div class="table-wrap">
+              <table class="table tabel-riwayat tabel-riwayat-bulanan {% if tampilkan_kolom_tahun %}tabel-riwayat-bulanan-semua-tahun{% endif %}">
+                <thead>
+                  <tr>
+                    {% if tampilkan_kolom_tahun %}
+                      <th>Tahun</th>
+                    {% endif %}
+                    <th>Bulan</th>
+                    <th>Jumlah Transaksi</th>
+                    <th>Total Item</th>
+                    <th>Total Penjualan</th>
+                    <th>Kasir</th>
+                    <th class="kolom-aksi">Aksi</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {% if daftar_bulanan_semua %}
+                    {% for bulan in daftar_bulanan_semua %}
+                      <tr>
+                        {% if tampilkan_kolom_tahun %}
+                          <td>{{ bulan.tahun_display }}</td>
+                        {% endif %}
+
+                        <td>{{ bulan.nama_bulan }}</td>
+                        <td>{{ bulan.jumlah_transaksi_bulan }}</td>
+                        <td>{{ bulan.total_item_bulan }}</td>
+                        <td>{{ bulan.total_penjualan_bulan }}</td>
+                        <td>{% firstof bulan.kasir_bulan bulan.nama_kasir "-" %}</td>
+
+                        <td class="kolom-aksi">
+                          <button
+                            type="button"
+                            class="tombol-detail tombol-detail-bulanan"
+                            data-bulan-detail
+                            data-bulan="{{ bulan.bulan_angka }}"
+                            data-tahun="{{ bulan.tahun }}"
+                            data-kasir-id="{{ bulan.kasir_id|default:0 }}"
+                          >
+                            Detail
+                          </button>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  {% else %}
+                    <tr>
+                      <td colspan="{% if tampilkan_kolom_tahun %}7{% else %}6{% endif %}" class="muted">
+                        <em>Belum ada data penjualan bulanan.</em>
+                      </td>
+                    </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+        {% else %}
+          <section class="card cloud kartu-riwayat">
+            <form method="get" id="formFilterHarian">
+              <input type="hidden" name="tampilan" value="harian">
+              <input type="hidden" name="tanggal" value="{{ tanggal_filter_value|default:'' }}">
+              <input type="hidden" name="kasir_id" id="kasirIdHidden" value="{{ kasir_id_terpilih|default:0 }}">
+            </form>
+
+            <div class="baris-filter">
+              <div class="kotak-filter">
+                <span class="label-info">Tanggal:</span>
+                <span class="nilai-info">{{ tanggal_dipilih|default:"Hari Ini" }}</span>
+              </div>
+
+              <div class="kotak-filter {% if role == 'pemilik' %}kotak-filter-has-select{% endif %}">
+                <span class="label-info">Kasir:</span>
+
+                {% if role == "pemilik" %}
+                  <select class="select-kasir" id="selectKasir">
+                    <option value="0">Semua Kasir</option>
+
+                    {% for k in opsi_kasir %}
+                      <option value="{{ k.id }}" {% if kasir_id_terpilih == k.id %}selected{% endif %}>
+                        {{ k.nama }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                {% else %}
+                  <span class="nilai-info">{{ nama_kasir|default:"-" }}</span>
+                {% endif %}
+              </div>
+
+              <div class="kotak-filter">
+                <span class="label-info">Transaksi:</span>
+                <span class="nilai-info">{{ jumlah_transaksi_harian|default:"0" }}</span>
+              </div>
+
+              <div class="kotak-filter">
+                <span class="label-info">Total:</span>
+                <span class="nilai-info">{{ total_penjualan_harian|default:"Rp 0" }}</span>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table class="table tabel-riwayat">
+                <thead>
+                  <tr>
+                    <th>Kode Transaksi</th>
+                    <th>Tanggal</th>
+                    <th>Jam</th>
+                    <th>Kasir</th>
+                    <th>Jenis Transaksi</th>
+                    <th>Total Penjualan</th>
+                    <th class="kolom-aksi">Aksi</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {% if daftar_riwayat %}
+                    {% for data in daftar_riwayat %}
+                      <tr>
+                        <td>{{ data.kode_transaksi }}</td>
+                        <td>{{ data.tanggal }}</td>
+                        <td>{{ data.jam }}</td>
+                        <td>{{ data.kasir }}</td>
+                        <td>
+                          <span class="badge-jenis badge-jenis-auto">
+                            {{ data.jenis_transaksi }}
+                          </span>
+                        </td>
+                        <td>{{ data.total_penjualan }}</td>
+
+                        <td class="kolom-aksi">
+                          <button
+                            type="button"
+                            class="tombol-detail"
+                            data-rw-detail="{{ data.id_transaksi }}"
+                          >
+                            Detail
+                          </button>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  {% else %}
+                    <tr>
+                      <td colspan="7" class="muted">
+                        <em>Belum ada data riwayat transaksi.</em>
+                      </td>
+                    </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        {% endif %}
+
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-riwayat" id="modalRiwayat" hidden aria-hidden="true">
+    <div class="modal-riwayat-backdrop" data-modal-close="harian"></div>
+
+    <div
+      class="modal-riwayat-dialog"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="detailTransaksiTitle"
+    >
+      <div class="modal-riwayat-head">
+        <h3 id="detailTransaksiTitle">Detail Transaksi</h3>
+        <button type="button" class="modal-close-btn" data-modal-close="harian" aria-label="Tutup">
+          ×
+        </button>
+      </div>
+
+      <div class="modal-riwayat-body">
+        <div id="detailLoading" class="detail-loading" hidden>Memuat detail...</div>
+        <div id="detailError" class="detail-error" hidden>Gagal memuat detail transaksi.</div>
+
+        <div id="detailContent" hidden>
+          <div class="detail-transaksi-box">
+
+            <div class="detail-transaksi-top">
+              <div class="detail-kode-card">
+                <div class="detail-mini-label">No. Jual</div>
+                <div class="detail-kode-value" id="dKode">-</div>
+              </div>
+
+              <div class="detail-meta-grid detail-meta-grid--5">
+                <div class="detail-meta-card">
+                  <span class="detail-meta-label">Tanggal</span>
+                  <strong id="dTanggal">-</strong>
+                </div>
+
+                <div class="detail-meta-card">
+                  <span class="detail-meta-label">Jam</span>
+                  <strong id="dJam">-</strong>
+                </div>
+
+                <div class="detail-meta-card">
+                  <span class="detail-meta-label">Kasir</span>
+                  <strong id="dKasir">-</strong>
+                </div>
+
+                <div class="detail-meta-card">
+                  <span class="detail-meta-label">Jenis Transaksi</span>
+                  <strong id="dJenisTransaksi">-</strong>
+                </div>
+
+                <div class="detail-meta-card">
+                  <span class="detail-meta-label">Marketplace</span>
+                  <strong id="dMarketplace">-</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-transaksi-main">
+              <div class="detail-barang-panel">
+                <div class="detail-panel-title">Daftar Barang</div>
+
+                <div class="detail-table-wrap">
+                  <table class="detail-table">
+                    <thead>
+                      <tr>
+                        <th>Nama Barang</th>
+                        <th>Besaran</th>
+                        <th>Qty</th>
+                        <th>Harga</th>
+                        <th>Subtotal</th>
+                      </tr>
+                    </thead>
+
+                    <tbody id="dItemsBody">
+                      <tr>
+                        <td colspan="5" class="muted"><em>Tidak ada item.</em></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="detail-ringkasan-panel">
+                <div class="detail-panel-title">Ringkasan Pembayaran</div>
+
+                <div class="detail-ringkasan-box">
+                  <div class="detail-ringkasan-row">
+                    <span>Total Barang</span>
+                    <strong id="dTotalItem">0</strong>
+                  </div>
+
+                  <div class="detail-ringkasan-row">
+                    <span>Total Belanja</span>
+                    <strong id="dTotalBelanja">Rp 0</strong>
+                  </div>
+
+                  <div class="detail-ringkasan-row">
+                    <span>Nominal Bayar</span>
+                    <strong id="dNominalBayar">Rp 0</strong>
+                  </div>
+
+                  <div class="detail-ringkasan-row detail-kembalian-row">
+                    <span>Kembalian</span>
+                    <strong id="dKembalian">Rp 0</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if role == "pemilik" %}
+    <div class="modal-riwayat" id="modalBulanan" hidden aria-hidden="true">
+      <div class="modal-riwayat-backdrop" data-modal-close="bulanan"></div>
+
+      <div
+        class="modal-riwayat-dialog modal-bulanan-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="detailBulananTitle"
+      >
+        <div class="modal-riwayat-head">
+          <h3 id="detailBulananTitle">Detail Penjualan Bulanan</h3>
+          <button type="button" class="modal-close-btn" data-modal-close="bulanan" aria-label="Tutup">
+            ×
+          </button>
+        </div>
+
+        <div class="modal-riwayat-body">
+          <div id="bulanLoading" class="detail-loading" hidden>Memuat detail bulanan...</div>
+          <div id="bulanError" class="detail-error" hidden>Gagal memuat detail bulanan.</div>
+
+          <div id="bulanContent" hidden>
+            <div class="detail-transaksi-box">
+
+              <div class="detail-transaksi-top">
+                <div class="detail-kode-card">
+                  <div class="detail-mini-label">Periode</div>
+                  <div class="detail-kode-value" id="bNamaBulan">-</div>
+                </div>
+
+                <div class="detail-meta-grid detail-meta-grid--3">
+                  <div class="detail-meta-card">
+                    <span class="detail-meta-label">Jumlah Transaksi</span>
+                    <strong id="bJumlahTransaksi">0</strong>
+                  </div>
+
+                  <div class="detail-meta-card">
+                    <span class="detail-meta-label">Total Item</span>
+                    <strong id="bTotalItem">0</strong>
+                  </div>
+
+                  <div class="detail-meta-card">
+                    <span class="detail-meta-label">Kasir</span>
+                    <strong id="bKasir">-</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="detail-ringkasan-panel bulanan-summary-panel">
+                <div class="detail-panel-title">Ringkasan Bulan</div>
+
+                <div class="detail-ringkasan-box">
+                  <div class="detail-ringkasan-row">
+                    <span>Total Penjualan Bulan Ini</span>
+                    <strong id="bTotalPenjualan">Rp 0</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div class="detail-barang-panel">
+                <div class="detail-panel-title">Daftar Transaksi Bulan Ini</div>
+
+                <div class="detail-table-wrap">
+                  <table class="detail-table detail-table-bulanan">
+                    <thead>
+                      <tr>
+                        <th>No. Jual</th>
+                        <th>Tanggal</th>
+                        <th>Jam</th>
+                        <th>Kasir</th>
+                        <th>Jenis</th>
+                        <th>Marketplace</th>
+                        <th>Nama Barang</th>
+                        <th>Besaran</th>
+                        <th>Total Item</th>
+                        <th>Total Belanja</th>
+                        <th>Nominal Bayar</th>
+                        <th>Kembalian</th>
+                      </tr>
+                    </thead>
+
+                    <tbody id="bTransaksiBody">
+                      <tr>
+                        <td colspan="12" class="muted"><em>Belum ada data transaksi.</em></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+</body>
+</html>

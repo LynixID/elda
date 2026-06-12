@@ -1,0 +1,448 @@
+{% load static %}
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rekomendasi - Sistem Kasir Harmoni Agro</title>
+
+  <meta name="csrf-token" content="{{ csrf_token }}">
+
+  <link rel="stylesheet" href="{% static 'kasir/css/home.css' %}?v=171">
+  <link rel="stylesheet" href="{% static 'kasir/css/rekomendasi.css' %}?v=rekomDropdownFixFinal11">
+
+  <script>
+    window.REKOMENDASI_PROSES_URL = "{% url 'kasir:rekomendasi_proses' %}";
+    window.PEMBELIAN_URL = "{% url 'kasir:pembelian' %}";
+  </script>
+
+  <script src="{% static 'kasir/js/home.js' %}?v=171" defer></script>
+  <script src="{% static 'kasir/js/rekomendasi.js' %}?v=rekomDropdownFixFinal12" defer></script>
+</head>
+
+<body
+  class="home-page navbar-mode halaman-rekomendasi"
+  data-role="{{ role|default:'' }}"
+  data-nama-kasir="{{ nama|default:'' }}"
+>
+
+  <div class="app-shell rekomendasi-shell">
+
+      <header class="main-navbar">
+
+        <div class="navbar-top">
+          <div class="nav-brand-wrap">
+            <a class="nav-brand" href="{% url 'kasir:home' %}">
+              <img
+                class="nav-brand-logo"
+                src="{% static 'kasir/img/logo_pertanian.png' %}"
+                alt="Logo Toko Pertanian Harmoni Agro"
+              >
+
+              <span class="nav-brand-copy">
+                <span class="nav-brand-kicker">Sistem Kasir</span>
+                <span class="nav-brand-text">Harmoni Agro</span>
+              </span>
+            </a>
+          </div>
+        </div>
+
+        <div class="navbar-bottom">
+          <nav class="nav-menu" aria-label="Menu utama">
+
+            <a class="nav-link" href="{% url 'kasir:home' %}">
+              Beranda
+            </a>
+
+            <!-- DROPDOWN TRANSAKSI -->
+            <div class="nav-dropdown" data-nav-dropdown>
+              <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false">
+                Transaksi
+                <span class="nav-caret"></span>
+              </button>
+
+              <div class="nav-dropdown-menu nav-dropdown-menu-rich">
+
+                <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:transaksi' %}">
+                  <span class="nav-item-icon" aria-hidden="true">🧾</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Penjualan</span>
+                    <span class="nav-item-desc">Mulai transaksi</span>
+                  </span>
+                </a>
+
+                {% if role == "pemilik" %}
+                  <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:pembelian' %}">
+                    <span class="nav-item-icon" aria-hidden="true">📦</span>
+                    <span class="nav-item-copy">
+                      <span class="nav-item-title">Pembelian</span>
+                      <span class="nav-item-desc">Kelola transaksi pembelian</span>
+                    </span>
+                  </a>
+
+                  <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:retur' %}">
+                    <span class="nav-item-icon" aria-hidden="true">↩️</span>
+                    <span class="nav-item-copy">
+                      <span class="nav-item-title">Retur Pembelian</span>
+                      <span class="nav-item-desc">Barang rusak / tidak sesuai</span>
+                    </span>
+                  </a>
+
+                  <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:pengembalian' %}">
+                    <span class="nav-item-icon" aria-hidden="true">📑</span>
+                    <span class="nav-item-copy">
+                      <span class="nav-item-title">Riwayat Pengembalian</span>
+                      <span class="nav-item-desc">Hasil retur dari supplier</span>
+                    </span>
+                  </a>
+                {% endif %}
+
+              </div>
+            </div>
+
+            <!-- DROPDOWN MASTER DATA -->
+            {% if role == "pemilik" %}
+              <div class="nav-dropdown" data-nav-dropdown>
+                <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false">
+                  Master Data
+                  <span class="nav-caret"></span>
+                </button>
+
+                <div class="nav-dropdown-menu nav-dropdown-menu-rich">
+
+                  <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:barang' %}">
+                    <span class="nav-item-icon" aria-hidden="true">📋</span>
+                    <span class="nav-item-copy">
+                      <span class="nav-item-title">Data Barang</span>
+                      <span class="nav-item-desc">Kelola data barang</span>
+                    </span>
+                  </a>
+
+                  <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:kategori' %}">
+                    <span class="nav-item-icon" aria-hidden="true">🏷️</span>
+                    <span class="nav-item-copy">
+                      <span class="nav-item-title">Data Kategori</span>
+                      <span class="nav-item-desc">Kelola kategori barang</span>
+                    </span>
+                  </a>
+
+                  <a class="nav-dropdown-item nav-dropdown-item-rich" href="{% url 'kasir:pembelian' %}#supplier">
+                    <span class="nav-item-icon" aria-hidden="true">🤝</span>
+                    <span class="nav-item-copy">
+                      <span class="nav-item-title">Data Supplier</span>
+                      <span class="nav-item-desc">Lihat dan kelola supplier pembelian</span>
+                    </span>
+                  </a>
+
+                </div>
+              </div>
+            {% endif %}
+
+            <a class="nav-link" href="{% url 'kasir:riwayat' %}">
+              Riwayat
+            </a>
+
+            {% if role == "pemilik" %}
+              <a class="nav-link" href="{% url 'kasir:pendapatan' %}">
+                Pendapatan
+              </a>
+
+              <a class="nav-link active" href="{% url 'kasir:rekomendasi' %}">
+                Rekomendasi
+              </a>
+            {% endif %}
+
+          </nav>
+
+          <button type="button" class="btn-top rekomendasi-toggle-top" data-rekom-toggle-top>
+            Sembunyikan Atas
+          </button>
+        </div>
+
+    </header>
+
+    <main class="main-content-area rekomendasi-page">
+      <section class="konten-rekomendasi">
+
+        <div class="kartu-input-rekomendasi">
+          <div class="pita-judul-input">
+            Filter Rekomendasi
+          </div>
+
+          <div class="form-input-rekomendasi">
+
+            <div class="grup-input-rekomendasi">
+              <label for="tanggalMulaiRekomendasi">Tanggal Mulai</label>
+              <input
+                id="tanggalMulaiRekomendasi"
+                class="input-rekomendasi"
+                type="date"
+                value="{{ periode_default.mulai|default:'' }}"
+              >
+            </div>
+
+            <div class="grup-input-rekomendasi">
+              <label for="tanggalSelesaiRekomendasi">Tanggal Selesai</label>
+              <input
+                id="tanggalSelesaiRekomendasi"
+                class="input-rekomendasi"
+                type="date"
+                value="{{ periode_default.selesai|default:'' }}"
+              >
+            </div>
+
+            <div class="grup-input-rekomendasi">
+              <label for="jenisBarangRekomendasi">Jenis Barang</label>
+              <select id="jenisBarangRekomendasi" class="input-rekomendasi" name="jenis_barang">
+                <option value="SEMUA">Semua jenis</option>
+
+                {% if jenis_barang_list %}
+                  {% for jenis in jenis_barang_list %}
+                    <option value="{{ jenis }}">{{ jenis }}</option>
+                  {% endfor %}
+                {% else %}
+                  {% for jenis in daftar_jenis_barang %}
+                    <option value="{{ jenis }}">{{ jenis }}</option>
+                  {% endfor %}
+                {% endif %}
+              </select>
+            </div>
+
+            <div class="grup-input-rekomendasi">
+              <label for="danaMaksimal">Batas Maksimal Dana</label>
+              <input
+                id="danaMaksimal"
+                class="input-rekomendasi"
+                type="text"
+                placeholder="Rp 0"
+                inputmode="numeric"
+                autocomplete="off"
+              >
+            </div>
+
+          </div>
+
+          <div class="aksi-input-rekomendasi">
+            <button
+              type="button"
+              id="tombolProsesRekomendasi"
+              class="tombol-rekomendasi tombol-proses-rekomendasi"
+            >
+              Proses Rekomendasi
+            </button>
+
+            <button
+              type="button"
+              id="tombolResetRekomendasi"
+              class="tombol-rekomendasi tombol-reset-rekomendasi"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <!-- POPUP HASIL -->
+  <div class="popup-latar-rekomendasi" id="popupHasilRekomendasi" aria-hidden="true">
+    <div class="popup-kartu-hasil-rekomendasi">
+
+      <div class="kepala-popup-rekomendasi">
+        <div>
+          <div class="judul-popup-rekomendasi">Hasil Rekomendasi Pembelian</div>
+          <div class="subjudul-popup-rekomendasi">
+            Rekomendasi ideal menunjukkan kebutuhan stok sebenarnya. Final beli menunjukkan jumlah yang masuk pembelian sesuai batas dana.
+          </div>
+        </div>
+
+        <button type="button" class="tombol-tutup-popup" data-tutup-popup="hasil">
+          ×
+        </button>
+      </div>
+
+      <div class="isi-popup-rekomendasi">
+
+        <div class="ringkasan-input-popup">
+          <div class="kartu-ringkasan-popup">
+            <span>Periode</span>
+            <strong id="ringkasPeriode">-</strong>
+          </div>
+
+          <div class="kartu-ringkasan-popup">
+            <span>Jenis Barang</span>
+            <strong id="ringkasJenis">-</strong>
+          </div>
+
+          <div class="kartu-ringkasan-popup">
+            <span>Dana Maksimal</span>
+            <strong id="ringkasDana">-</strong>
+          </div>
+        </div>
+
+        <div class="grid-ringkasan-hasil compact ringkasan-final-rekomendasi">
+          <div class="kartu-hasil-ringkas rekomendasi compact-card">
+            <span>Total Final Beli</span>
+            <strong id="ringkasTotalRekomendasi">0 barang</strong>
+          </div>
+
+          <div class="kartu-hasil-ringkas digunakan compact-card">
+            <span>Total Dana Digunakan</span>
+            <strong id="totalDanaDigunakan">Rp 0</strong>
+          </div>
+
+          <div class="kartu-hasil-ringkas sisa compact-card">
+            <span>Sisa Dana</span>
+            <strong id="sisaDana">Rp 0</strong>
+          </div>
+
+          <div class="kartu-hasil-ringkas prioritas compact-card">
+            <span>Barang Paling Prioritas</span>
+            <strong id="barangPrioritasUtama">-</strong>
+            <small id="keteranganPrioritasUtama">-</small>
+          </div>
+
+          <div class="kartu-hasil-ringkas aksi-pembelian-card compact-card">
+            <span>Aksi Pembelian</span>
+            <button
+              type="button"
+              id="btnBuatPembelianDariRekomendasi"
+              class="tombol-rekomendasi tombol-proses-rekomendasi tombol-card-pembelian"
+            >
+              Buat Pembelian
+            </button>
+          </div>
+        </div>
+
+        <div class="wadah-tabel-rekomendasi">
+          <table class="tabel-hasil-rekomendasi tabel-hasil-rekomendasi-ringkas">
+            <thead>
+              <tr>
+                <th>Kode</th>
+                <th>Nama Barang / Besaran</th>
+                <th>Stok Saat Ini</th>
+                <th>Stok Minimal</th>
+                <th>Terjual</th>
+                <th>Rekomendasi Ideal</th>
+                <th>Final Beli</th>
+                <th>Dana Dibutuhkan</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+
+            <tbody id="isiTabelRekomendasi">
+              <tr>
+                <td colspan="10" class="sel-kosong-rekomendasi">
+                  Belum ada hasil rekomendasi.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP DETAIL -->
+  <div class="popup-latar-rekomendasi popup-detail-hitung" id="popupDetailPerhitungan" aria-hidden="true">
+    <div class="popup-kartu-detail-rekomendasi">
+
+      <div class="kepala-popup-rekomendasi">
+        <div>
+          <div class="judul-popup-rekomendasi">Detail Rekomendasi</div>
+          <div class="subjudul-popup-rekomendasi" id="judulDetailItem">-</div>
+        </div>
+
+        <button type="button" class="tombol-tutup-popup" data-tutup-popup="detail">
+          ×
+        </button>
+      </div>
+
+      <div class="isi-popup-rekomendasi">
+        <div class="detail-grid-rekomendasi">
+
+          <div class="detail-card">
+            <h3>Informasi Barang</h3>
+
+            <div class="detail-table">
+              <div class="detail-row">
+                <span>Kode Barang</span>
+                <strong id="detailKodeBarang">-</strong>
+              </div>
+
+              <div class="detail-row">
+                <span>Nama Barang</span>
+                <strong id="detailNamaBarang">-</strong>
+              </div>
+
+              <div class="detail-row">
+                <span>Besaran / Satuan</span>
+                <strong id="detailSatuanBarang">-</strong>
+              </div>
+
+              <div class="detail-row">
+                <span>Stok Saat Ini</span>
+                <strong id="detailStokSaatIni">0</strong>
+              </div>
+
+              <div class="detail-row">
+                <span>Stok Minimal</span>
+                <strong id="detailStokMinimal">0</strong>
+              </div>
+
+              <div class="detail-row">
+                <span>Terjual Periode Ini</span>
+                <strong id="detailTerjualPeriode">0</strong>
+              </div>
+
+              <div class="detail-row">
+                <span>Status</span>
+                <strong id="detailStatusKebutuhan">-</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-card">
+            <h3>Saran Pembelian</h3>
+
+            <div class="detail-table">
+              <div class="detail-row">
+                <span>Rekomendasi Ideal</span>
+                <strong id="detailRekomendasiIdeal">0 barang</strong>
+              </div>
+
+              <div class="detail-row">
+                <span>Final Beli</span>
+                <strong id="detailQtyFinalBeli">0 barang</strong>
+              </div>
+
+              <div class="detail-row">
+                <span>Harga Beli Satuan</span>
+                <strong id="detailHargaBeliSatuan">Rp 0</strong>
+              </div>
+
+              <div class="detail-row">
+                <span>Total Dana Dibutuhkan</span>
+                <strong id="detailDanaFinalBeli">Rp 0</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-card card-lebar">
+            <h3>Alasan Rekomendasi</h3>
+            <div id="detailPenjelasanSederhana" class="kotak-penjelasan-detail">
+              -
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

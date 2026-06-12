@@ -1,0 +1,224 @@
+{% load static %}
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pendapatan - Sistem Kasir Harmoni Agro</title>
+
+  <link rel="stylesheet" href="{% static 'kasir/css/pendapatan.css' %}?v=pendapatanCompact02">
+
+  <script>
+    window.PD_LABELS = JSON.parse('{{ chart_labels_json|default:"[]"|escapejs }}');
+    window.PD_VALUES = JSON.parse('{{ chart_values_json|default:"[]"|escapejs }}');
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <script src="{% static 'kasir/js/pendapatan.js' %}?v=pendapatanCompact02" defer></script>
+</head>
+
+<body data-role="{{ role|default:'' }}" class="pd-page topbar-hidden">
+  <div class="app-shell">
+
+    <header class="main-navbar">
+      <div class="navbar-top">
+        <div class="nav-brand-wrap">
+          <a href="{% url 'kasir:home' %}" class="nav-brand">
+            <img
+              src="{% static 'kasir/img/logo_pertanian.png' %}"
+              alt="Toko Pertanian Harmoni Agro"
+              class="nav-brand-logo"
+            >
+
+            <div class="nav-brand-copy">
+              <span class="nav-brand-kicker">Sistem Kasir</span>
+              <span class="nav-brand-text">Harmoni Agro</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="navbar-bottom">
+        <nav class="nav-menu" aria-label="Menu utama">
+          <a class="nav-link" href="{% url 'kasir:home' %}">
+            Beranda
+          </a>
+
+          <div class="nav-dropdown">
+            <button type="button" class="nav-link nav-toggle" aria-expanded="false">
+              <span>Transaksi</span>
+              <span class="nav-caret" aria-hidden="true"></span>
+            </button>
+
+            <div class="nav-dropdown-menu nav-dropdown-menu-rich">
+              <a href="{% url 'kasir:transaksi' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+                <span class="nav-item-icon" aria-hidden="true">🧾</span>
+                <span class="nav-item-copy">
+                  <span class="nav-item-title">Penjualan</span>
+                  <span class="nav-item-desc">Mulai transaksi penjualan barang</span>
+                </span>
+              </a>
+
+              {% if role == "pemilik" %}
+                <a href="{% url 'kasir:pembelian' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+                  <span class="nav-item-icon" aria-hidden="true">📦</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Pembelian</span>
+                    <span class="nav-item-desc">Kelola transaksi pembelian stok</span>
+                  </span>
+                </a>
+
+                <a href="{% url 'kasir:retur' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+                  <span class="nav-item-icon" aria-hidden="true">↩️</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Retur Pembelian</span>
+                    <span class="nav-item-desc">Barang rusak / tidak sesuai</span>
+                  </span>
+                </a>
+
+                <a class="nav-dropdown-item nav-dropdown-item-rich active" href="{% url 'kasir:pengembalian' %}">
+                  <span class="nav-item-icon" aria-hidden="true">📑</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Riwayat Pengembalian</span>
+                    <span class="nav-item-desc">Hasil retur dari supplier</span>
+                  </span>
+                </a>
+              {% endif %}
+            </div>
+          </div>
+
+          {% if role == "pemilik" %}
+            <div class="nav-dropdown">
+              <button type="button" class="nav-link nav-toggle" aria-expanded="false">
+                <span>Master Data</span>
+                <span class="nav-caret" aria-hidden="true"></span>
+              </button>
+
+              <div class="nav-dropdown-menu nav-dropdown-menu-rich">
+                <a href="{% url 'kasir:barang' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+                  <span class="nav-item-icon" aria-hidden="true">📋</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Data Barang</span>
+                    <span class="nav-item-desc">Kelola data barang</span>
+                  </span>
+                </a>
+
+                <a href="{% url 'kasir:kategori' %}" class="nav-dropdown-item nav-dropdown-item-rich">
+                  <span class="nav-item-icon" aria-hidden="true">🏷️</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Data Kategori</span>
+                    <span class="nav-item-desc">Kelola kategori barang</span>
+                  </span>
+                </a>
+
+                <a href="{% url 'kasir:pembelian' %}#supplier" class="nav-dropdown-item nav-dropdown-item-rich">
+                  <span class="nav-item-icon" aria-hidden="true">🤝</span>
+                  <span class="nav-item-copy">
+                    <span class="nav-item-title">Data Supplier</span>
+                    <span class="nav-item-desc">Lihat dan kelola supplier pembelian</span>
+                  </span>
+                </a>
+              </div>
+            </div>
+          {% endif %}
+
+          <a class="nav-link" href="{% url 'kasir:riwayat' %}">
+            Riwayat
+          </a>
+
+          {% if role == "pemilik" %}
+            <a class="nav-link active" href="{% url 'kasir:pendapatan' %}">
+              Pendapatan
+            </a>
+
+            <a class="nav-link" href="{% url 'kasir:rekomendasi' %}">
+              Rekomendasi
+            </a>
+          {% endif %}
+        </nav>
+
+        <div class="nav-actions">
+          <form method="get" class="pd-filterForm pd-filterFormTopbar">
+            <label for="pdTahun" class="pd-filterLabel">Tahun</label>
+
+            <select id="pdTahun" name="tahun" class="pd-filterSelect" onchange="this.form.submit()">
+              <option value="0" {% if not tahun_filter %}selected{% endif %}>
+                Semua Tahun
+              </option>
+
+              {% for th in daftar_tahun %}
+                <option value="{{ th }}" {% if tahun_filter|stringformat:"s" == th|stringformat:"s" %}selected{% endif %}>
+                  {{ th }}
+                </option>
+              {% endfor %}
+            </select>
+          </form>
+
+          <button type="button" class="top-toggle-btn" data-topbar-toggle>
+            Tampilkan Atas
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content-area">
+      <section class="pd-content">
+
+        <div class="pd-summaryGrid">
+          <article class="pd-statCard pd-statCard--high">
+            <div class="pd-statAccent"></div>
+
+            <div class="pd-statInner">
+              <div class="pd-statIcon">Rp</div>
+
+              <div class="pd-statText">
+                <div class="pd-statLabel">{{ label_tertinggi|default:"Tahun Tertinggi" }}</div>
+
+                <div class="pd-statValue" id="pdHighestValue">
+                  {{ nominal_tertinggi|default:"Rp 0" }}
+                  {% if periode_tertinggi %}
+                    <span class="pd-statMonth">({{ periode_tertinggi }})</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="pd-statCard pd-statCard--low">
+            <div class="pd-statAccent"></div>
+
+            <div class="pd-statInner">
+              <div class="pd-statIcon pd-statIcon--low">Rp</div>
+
+              <div class="pd-statText">
+                <div class="pd-statLabel">{{ label_terendah|default:"Tahun Terendah" }}</div>
+
+                <div class="pd-statValue" id="pdLowestValue">
+                  {{ nominal_terendah|default:"Rp 0" }}
+                  {% if periode_terendah %}
+                    <span class="pd-statMonth">({{ periode_terendah }})</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <article class="pd-chartCard">
+          <div class="pd-chartHead">
+            <div>
+              <h2 class="pd-chartTitle">{{ chart_title|default:"Tren Pendapatan Tahunan" }}</h2>
+              <p class="pd-chartSub">{{ chart_subtitle|default:"Perbandingan pendapatan setiap tahun" }}</p>
+            </div>
+          </div>
+
+          <div class="pd-chartCanvasWrap">
+            <canvas id="pdChart"></canvas>
+          </div>
+        </article>
+
+      </section>
+    </main>
+  </div>
+</body>
+</html>

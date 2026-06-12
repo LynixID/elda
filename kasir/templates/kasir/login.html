@@ -1,0 +1,117 @@
+{% load static %}
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login - Sistem Kasir Harmoni Agro</title>
+
+  <link rel="stylesheet" href="{% static 'kasir/css/login.css' %}">
+</head>
+
+<body>
+  <main class="page">
+    <!-- efek background -->
+    <div class="haze" aria-hidden="true"></div>
+    <div class="seam" aria-hidden="true"></div>
+
+    <!-- sisi kiri (visual) -->
+    <section class="left" aria-hidden="true">
+      <div class="left-overlay" aria-hidden="true"></div>
+    </section>
+
+    <!-- sisi kanan (form) -->
+    <section class="right">
+      <div class="right-bg">
+        <div class="card" role="region" aria-label="Form Login Sistem Kasir Harmoni Agro">
+
+          <header class="card-head">
+            <h1 class="title">MASUK SISTEM KASIR<br><span>HARMONI AGRO</span></h1>
+          </header>
+
+          {% if messages %}
+            <div class="alert" role="alert" aria-live="polite">
+              {% for message in messages %}
+                <div class="msg {{ message.tags }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <form method="post" class="form" autocomplete="off" novalidate>
+            {% csrf_token %}
+
+            <div class="field">
+              <label class="label" for="username">
+                <span class="label-ico" aria-hidden="true">👤</span>
+                <span>Username</span>
+              </label>
+
+              <input
+                id="username"
+                name="username"
+                type="text"
+                class="input"
+                placeholder="Masukkan username"
+                value="{{ request.POST.username|default_if_none:'' }}"
+                required
+                autocomplete="username"
+              >
+            </div>
+
+            <div class="field">
+              <label class="label" for="password">
+                <span class="label-ico" aria-hidden="true">🔒</span>
+                <span>Password</span>
+              </label>
+
+              <div class="pw-wrap">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  class="input"
+                  placeholder="Masukkan password"
+                  required
+                  autocomplete="current-password"
+                >
+
+                <button
+                  class="pw-toggle"
+                  type="button"
+                  data-target="password"
+                  aria-label="Tampilkan password"
+                  title="Tampilkan/Sembunyikan"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"></path>
+                    <path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7Z"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="row">
+              <label class="remember">
+                <input
+                  type="checkbox"
+                  name="remember"
+                  {% if request.POST.remember %}checked{% endif %}
+                >
+                <span>Ingat saya</span>
+              </label>
+
+              <a class="forgot" href="{% url 'kasir:lupapassword' %}">Lupa Password?</a>
+            </div>
+
+            <button class="btn" type="submit">Masuk</button>
+          </form>
+        </div>
+
+        <div class="leaf-bottom" aria-hidden="true"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="{% static 'kasir/js/password.js' %}"></script>
+</body>
+</html>

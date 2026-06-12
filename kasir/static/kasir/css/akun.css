@@ -1,0 +1,488 @@
+:root{
+  --bg: rgba(255,255,255,.72);
+  --card: rgba(255,255,255,.78);
+  --line: rgba(0,0,0,.10);
+  --text: rgba(0,0,0,.78);
+  --muted: rgba(0,0,0,.55);
+  --accent: #5A723B;
+  --accent2:#4E6A34;
+  --warn:#D6A33A;
+  --danger:#b32525;
+  --shadow: 0 14px 28px rgba(0,0,0,.14);
+  --radius: 16px;
+
+  --soft: rgba(90,114,59,.10);
+  --soft2: rgba(90,114,59,.06);
+
+  --z-dropdown: 2000;
+  --z-modal: 3000;
+}
+
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  color: var(--text);
+}
+
+body.modal-open{
+  overflow: hidden;
+}
+
+/* =========================================================
+   OVERLAY DROPDOWN
+   dimatikan supaya tidak ada area transparan yang nangkep klik
+   ========================================================= */
+.dd-overlay,
+.dd-overlay.show{
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* =========================================================
+   PAKSA DROPDOWN AKUN TIDAK NYANGKUT SAAT TERTUTUP
+   akun.css dimuat setelah home.css, jadi override di sini
+   ========================================================= */
+.account::before,
+.account::after,
+.account.open::before,
+.account.open::after{
+  content: none !important;
+  display: none !important;
+  pointer-events: none !important;
+}
+
+.account{
+  position: relative;
+}
+
+.account-pop{
+  z-index: calc(var(--z-dropdown) + 1) !important;
+}
+
+.account:not(.open) .account-pop,
+.account:not(.open) .account-pop *{
+  pointer-events: none !important;
+}
+
+.account-pop[hidden],
+.account-pop[aria-hidden="true"]{
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.account.open .account-pop{
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* =========================================================
+   MODAL UMUM
+   ========================================================= */
+.modal{
+  z-index: var(--z-modal);
+}
+
+.modal:not(.show),
+.modal[aria-hidden="true"]{
+  display: none !important;
+  pointer-events: none !important;
+}
+
+.modal.show,
+.modal[aria-hidden="false"]{
+  pointer-events: auto !important;
+}
+
+.modal-card.ap-modal{
+  width: min(560px, 92vw) !important;
+  max-height: 88vh;
+  overflow: hidden;
+  border-radius: 18px;
+  background: rgba(255,255,255,.92);
+  border: 1px solid rgba(0,0,0,.10);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(8px);
+}
+
+.modal-body.ap-body{
+  padding: 14px 16px 16px;
+  overflow: auto;
+  max-height: calc(88vh - 58px);
+}
+
+/* =========================================================
+   HEADER PROFIL
+   ========================================================= */
+.ap-profile{
+  display:flex;
+  flex-direction: column;
+  align-items:center;
+  gap: 10px;
+  padding: 16px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,.08);
+  background: rgba(255,255,255,.78);
+}
+
+.ap-avatarWrap{
+  width: 112px;
+  height: 112px;
+  border-radius: 999px;
+  background: var(--soft);
+  border: 1px solid rgba(90,114,59,.18);
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+  flex-shrink: 0;
+}
+
+.ap-avatarImg{
+  width: 100%;
+  height: 100%;
+  display:block;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 999px;
+}
+
+.ap-avatarPlaceholder{
+  width: 100%;
+  height: 100%;
+  display:grid;
+  place-items:center;
+  font-size: 44px;
+  font-weight: 900;
+  color: rgba(0,0,0,.32);
+  background: rgba(255,255,255,.92);
+  border-radius: 999px;
+}
+
+.ap-name{
+  font-weight: 900;
+  font-size: 18px;
+  margin-top: 2px;
+  text-align:center;
+}
+
+.ap-handle{
+  margin-top: -4px;
+  font-weight: 800;
+  color: rgba(0,0,0,.55);
+  text-align:center;
+}
+
+.ap-help{
+  font-size: 12px;
+  color: var(--muted);
+  text-align:center;
+  line-height: 1.4;
+}
+
+.ap-photoActions{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content:center;
+  margin-top: 6px;
+}
+
+.ap-file{
+  display:none !important;
+}
+
+/* =========================================================
+   BUTTON
+   ========================================================= */
+.ap-btn{
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,.12);
+  font-weight: 900;
+  cursor:pointer;
+  background: rgba(255,255,255,.92);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap: 8px;
+  user-select:none;
+  min-width: 150px;
+  text-decoration:none;
+  transition: .18s ease;
+}
+
+.ap-btn:hover{
+  border-color: rgba(90,114,59,.30);
+  box-shadow: 0 0 0 4px rgba(90,114,59,.10);
+}
+
+.ap-btnGhost{
+  background: rgba(255,255,255,.92);
+  color: var(--text);
+}
+
+.ap-btnPrimary{
+  background: var(--accent);
+  border-color: rgba(0,0,0,.08);
+  color:#fff;
+}
+
+.ap-btnPrimary:hover{
+  background: var(--accent2);
+  box-shadow:none;
+}
+
+.ap-btnDanger{
+  border-color: rgba(179,37,37,.28);
+  background: rgba(255,230,230,.82);
+  color: rgba(120,0,0,.85);
+}
+
+.ap-btnDanger:hover{
+  box-shadow: 0 0 0 4px rgba(179,37,37,.10);
+  border-color: rgba(179,37,37,.35);
+}
+
+/* =========================================================
+   FORM LIST
+   ========================================================= */
+.ap-form{
+  margin-top: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,.08);
+  background: rgba(255,255,255,.72);
+  overflow:hidden;
+}
+
+.ap-row{
+  display:grid;
+  grid-template-columns: 150px 1fr;
+  gap: 12px;
+  padding: 12px 12px;
+  border-top: 1px solid rgba(0,0,0,.06);
+}
+
+.ap-row:first-child{
+  border-top: none;
+}
+
+.ap-label{
+  font-weight: 900;
+  color: rgba(0,0,0,.78);
+  display:flex;
+  align-items:center;
+}
+
+.ap-control{
+  display:flex;
+  flex-direction:column;
+  gap: 6px;
+}
+
+.ap-input{
+  height: 46px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,.12);
+  padding: 0 14px;
+  background: rgba(255,255,255,.95);
+  outline: none;
+  font-weight: 800;
+  width: 100%;
+  color: var(--text);
+}
+
+.ap-input:focus{
+  border-color: rgba(90,114,59,.35);
+  box-shadow: 0 0 0 4px rgba(90,114,59,.12);
+}
+
+.ap-input[readonly]{
+  background: rgba(245,245,245,.96);
+  color: rgba(0,0,0,.62);
+  cursor: not-allowed;
+  border-color: rgba(0,0,0,.10);
+  box-shadow: none;
+}
+
+.ap-input[readonly]:focus{
+  border-color: rgba(0,0,0,.10);
+  box-shadow: none;
+}
+
+.ap-hint{
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.ap-actions{
+  display:flex;
+  gap: 10px;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+  margin-top: 14px;
+}
+
+/* =========================================================
+   MODAL CROP - CENTER
+   ========================================================= */
+#modal-crop{
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 24px;
+  background: rgba(0,0,0,.45);
+  z-index: 9999 !important;
+  overflow: auto;
+  pointer-events: none;
+}
+
+#modal-crop.show{
+  display: flex !important;
+  pointer-events: auto !important;
+}
+
+#modal-crop .modal-card.ap-modal{
+  width: min(720px, 94vw) !important;
+  max-height: calc(100vh - 48px);
+  position: relative;
+  z-index: 10000;
+  margin: 0 !important;
+  transform: none !important;
+  left: auto !important;
+  top: auto !important;
+}
+
+#modal-crop .modal-head,
+#modal-crop .modal-body{
+  width: 100%;
+}
+
+#modal-crop .modal-body.ap-body{
+  max-height: calc(92vh - 58px);
+}
+
+#modal-crop .ap-actions{
+  justify-content: flex-end;
+}
+
+.crop-stage{
+  width: 100%;
+  min-height: 320px;
+  height: 420px;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,.08);
+  background:
+    linear-gradient(45deg, rgba(0,0,0,.03) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(0,0,0,.03) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(0,0,0,.03) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(0,0,0,.03) 75%);
+  background-size: 18px 18px;
+  background-position: 0 0, 0 9px, 9px -9px, -9px 0;
+}
+
+#cropImage{
+  display:block;
+  max-width:100%;
+  width: 100%;
+}
+
+/* cropper */
+.cropper-container{
+  font-family: Arial, sans-serif;
+}
+
+.cropper-view-box{
+  outline: 2px solid rgba(255,255,255,.95);
+  outline-color: rgba(255,255,255,.95);
+}
+
+.cropper-face{
+  background-color: rgba(255,255,255,.08);
+}
+
+.cropper-line,
+.cropper-point{
+  background-color: rgba(255,255,255,.95);
+}
+
+.cropper-bg{
+  background-image: none !important;
+  background-color: rgba(0,0,0,.04);
+}
+
+.cropper-modal{
+  background-color: rgba(0,0,0,.38) !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width: 640px){
+  .modal-card.ap-modal{
+    width: min(520px, 94vw) !important;
+  }
+
+  #modal-crop{
+    padding: 12px;
+  }
+
+  #modal-crop .modal-card.ap-modal{
+    width: min(96vw, 560px) !important;
+    max-height: calc(100vh - 24px);
+  }
+
+  .modal-body.ap-body{
+    padding: 12px;
+  }
+
+  .ap-row{
+    grid-template-columns: 1fr;
+  }
+
+  .ap-label{
+    padding-bottom: 2px;
+  }
+
+  .ap-photoActions{
+    width: 100%;
+  }
+
+  .ap-btn{
+    width: 100%;
+    min-width: 0;
+  }
+
+  .ap-actions{
+    justify-content: stretch;
+  }
+
+  #modal-crop .ap-actions{
+    justify-content: stretch;
+  }
+
+  .ap-avatarWrap{
+    width: 98px;
+    height: 98px;
+  }
+
+  .ap-avatarPlaceholder{
+    font-size: 40px;
+  }
+
+  .crop-stage{
+    min-height: 260px;
+    height: 340px;
+  }
+}

@@ -10,7 +10,6 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load file .env untuk lokal dan hosting yang memakai file .env
 load_dotenv(BASE_DIR / ".env")
 
 

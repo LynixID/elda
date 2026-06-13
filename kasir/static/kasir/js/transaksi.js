@@ -1244,7 +1244,7 @@
       }, 2800);
     }
 
-    const LOCAL_PRINT_SERVER = "http://localhost:27631";
+    const LOCAL_PRINT_SERVER = "http://127.0.0.1:27631";
 
     /**
      * Konversi string base64 ke Uint8Array (binary).

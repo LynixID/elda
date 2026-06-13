@@ -471,6 +471,25 @@ def _to_wib(dt_obj):
         return dt_obj
 
 
+def _filter_date_range_helper(qs, awal_date, akhir_date, field_name="tanggal_waktu"):
+    from datetime import datetime, time
+    from django.utils import timezone
+    tz_wib = _get_timezone_wib()
+    dt_awal = datetime.combine(awal_date, time.min)
+    dt_akhir = datetime.combine(akhir_date, time.min)
+    if tz_wib:
+        try:
+            dt_awal = timezone.make_aware(dt_awal, tz_wib)
+            dt_akhir = timezone.make_aware(dt_akhir, tz_wib)
+        except Exception:
+            pass
+    kwargs = {
+        f"{field_name}__gte": dt_awal,
+        f"{field_name}__lt": dt_akhir,
+    }
+    return qs.filter(**kwargs)
+
+
 # =========================================================
 # PARSER / FORMAT ANGKA
 # =========================================================
@@ -3293,7 +3312,8 @@ def home(request):
     except Exception:
         hari_ini = timezone.localdate()
 
-    qs_trx_hari_ini = TbTransaksi.objects.filter(tanggal_waktu__date=hari_ini)
+    from datetime import timedelta
+    qs_trx_hari_ini = _filter_date_range_helper(TbTransaksi.objects.all(), hari_ini, hari_ini + timedelta(days=1))
     if role != "pemilik":
         qs_trx_hari_ini = qs_trx_hari_ini.filter(id_kasir=user_id)
 
@@ -6212,7 +6232,8 @@ def riwayat(request):
 
         kasir_id_filter = _to_int(request.GET.get("kasir_id"), 0)
 
-        qs_harian = qs_dasar.filter(tanggal_waktu__date=tanggal_filter)
+        from datetime import timedelta
+        qs_harian = _filter_date_range_helper(qs_dasar, tanggal_filter, tanggal_filter + timedelta(days=1))
 
         if role == "pemilik" and kasir_id_filter > 0:
             qs_harian = qs_harian.filter(id_kasir=kasir_id_filter)
@@ -6280,16 +6301,25 @@ def riwayat(request):
         reverse=True
     )
 
-    rekap_bulanan = (
-        qs_bulanan_source
-        .annotate(bulan_rekap=TruncMonth("tanggal_waktu"))
-        .values("bulan_rekap")
-        .annotate(
-            jumlah_transaksi_bulan=Count("id_transaksi"),
-            total_penjualan_bulan=Sum("total_harga"),
-        )
-        .order_by("-bulan_rekap")
-    )
+    rekap_dict = defaultdict(lambda: {"jumlah_transaksi_bulan": 0, "total_penjualan_bulan": 0})
+    for trx in qs_bulanan_source.only("id_transaksi", "tanggal_waktu", "total_harga"):
+        dt = trx.tanggal_waktu
+        if not dt:
+            continue
+        dt_wib = _to_wib(dt)
+        if not dt_wib:
+            continue
+        bulan_rekap = dt_wib.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        rekap_dict[bulan_rekap]["jumlah_transaksi_bulan"] += 1
+        rekap_dict[bulan_rekap]["total_penjualan_bulan"] += int(trx.total_harga or 0)
+
+    rekap_bulanan = []
+    for bulan_rekap, vals in sorted(rekap_dict.items(), reverse=True):
+        rekap_bulanan.append({
+            "bulan_rekap": bulan_rekap,
+            "jumlah_transaksi_bulan": vals["jumlah_transaksi_bulan"],
+            "total_penjualan_bulan": vals["total_penjualan_bulan"],
+        })
 
     daftar_bulanan_semua = []
     jumlah_transaksi_bulanan_total = 0
@@ -6309,10 +6339,7 @@ def riwayat(request):
 
         awal_bulan, akhir_bulan = _range_bulan(tahun, bulan)
 
-        qs_bulan = qs_bulanan_source.filter(
-            tanggal_waktu__date__gte=awal_bulan,
-            tanggal_waktu__date__lt=akhir_bulan,
-        )
+        qs_bulan = _filter_date_range_helper(qs_bulanan_source, awal_bulan, akhir_bulan)
 
         ringkas = _ambil_ringkasan_bulanan(qs_bulan, peta_user)
 
@@ -6513,10 +6540,7 @@ def riwayat_bulanan_detail(request, tahun, bulan):
 
         awal_bulan, akhir_bulan = _range_bulan(tahun, bulan)
 
-        qs_bulan = qs_dasar.filter(
-            tanggal_waktu__date__gte=awal_bulan,
-            tanggal_waktu__date__lt=akhir_bulan,
-        )
+        qs_bulan = _filter_date_range_helper(qs_dasar, awal_bulan, akhir_bulan)
 
         hasil = _ambil_ringkasan_bulanan(qs_bulan, peta_user)
 
@@ -6602,10 +6626,7 @@ def pendapatan(request):
         for bulan in range(1, 13):
             awal_bulan, akhir_bulan = _range_bulan(tahun_filter, bulan)
 
-            qs_bulan = qs_dasar.filter(
-                tanggal_waktu__date__gte=awal_bulan,
-                tanggal_waktu__date__lt=akhir_bulan,
-            )
+            qs_bulan = _filter_date_range_helper(qs_dasar, awal_bulan, akhir_bulan)
 
             hasil_bulan = _ambil_ringkasan_bulanan(qs_bulan, peta_user)
             total_bulan = _normalize_nominal_penuh(hasil_bulan.get("total_penjualan", 0) or 0)
@@ -6640,10 +6661,7 @@ def pendapatan(request):
         for th in tahun_urut_naik:
             awal_tahun, akhir_tahun = _range_tahun(th)
 
-            qs_tahun = qs_dasar.filter(
-                tanggal_waktu__date__gte=awal_tahun,
-                tanggal_waktu__date__lt=akhir_tahun,
-            )
+            qs_tahun = _filter_date_range_helper(qs_dasar, awal_tahun, akhir_tahun)
 
             hasil_tahun = _ambil_ringkasan_bulanan(qs_tahun, peta_user)
             total_tahun = _normalize_nominal_penuh(hasil_tahun.get("total_penjualan", 0) or 0)

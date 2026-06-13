@@ -334,7 +334,8 @@ body.modal-open{
 /* =========================================================
    MODAL CROP - CENTER
    ========================================================= */
-#modal-crop{
+body.home-page #modal-crop,
+body.home-page #modal-crop.show{
   position: fixed;
   inset: 0;
   display: none;
@@ -342,12 +343,12 @@ body.modal-open{
   justify-content: center !important;
   padding: 24px;
   background: rgba(0,0,0,.45);
-  z-index: 9999 !important;
+  z-index: 130000 !important;
   overflow: auto;
   pointer-events: none;
 }
 
-#modal-crop.show{
+body.home-page #modal-crop.show{
   display: flex !important;
   pointer-events: auto !important;
 }

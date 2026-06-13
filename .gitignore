@@ -3,7 +3,7 @@
 venv/
 env/
 media/
-
+gunicorn.service
 __pycache__/
 *.pyc
 *.pyo
@@ -12,6 +12,10 @@ __pycache__/
 .vscode/
 .DS_Store
 Thumbs.db
-
+dist/
 *.log
+
 staticfiles/
+nginx_kasir_ssl.conf
+nginx_kasir.conf
+PrintServer-HarmoniAgro.spec

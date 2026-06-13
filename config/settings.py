@@ -35,13 +35,17 @@ DEBUG = env_bool("DEBUG", True)
 
 ALLOWED_HOSTS = env_list(
     "ALLOWED_HOSTS",
-    "127.0.0.1,localhost,wheat-barracuda-swoop.ngrok-free.dev"
+    "127.0.0.1,localhost,harmoniagro.biz.id,www.harmoniagro.biz.id,8.215.111.168,wheat-barracuda-swoop.ngrok-free.dev"
 )
 
 CSRF_TRUSTED_ORIGINS = env_list(
     "CSRF_TRUSTED_ORIGINS",
-    "https://wheat-barracuda-swoop.ngrok-free.dev"
+    "https://harmoniagro.biz.id,https://www.harmoniagro.biz.id,https://wheat-barracuda-swoop.ngrok-free.dev"
 )
+
+# Memberitahu Django bahwa request dienkripsi SSL/HTTPS via proxy (Nginx/Cloudflare)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 
 
 # Application definition

@@ -16,7 +16,7 @@ import sys
 import os
 import time
 import threading
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 # =============================================
 # KONFIGURASI
@@ -89,8 +89,10 @@ class PrintHandler(BaseHTTPRequestHandler):
         # Izinkan semua origin — request ini hanya bisa datang dari
         # browser di PC lokal karena server hanya listen di 127.0.0.1
         self.send_header("Access-Control-Allow-Origin", origin or "*")
-        self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type, X-Printer-Name")
+        self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS, GET")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, X-Printer-Name, Access-Control-Request-Private-Network")
+        # Sangat krusial untuk Chrome/Edge/Opera (Private Network Access)
+        self.send_header("Access-Control-Allow-Private-Network", "true")
         self.send_header("Access-Control-Max-Age", "86400")
 
     def do_OPTIONS(self):
@@ -186,7 +188,7 @@ def main():
     print("  Server aktif. Tekan CTRL+C untuk berhenti.")
     print("=" * 55)
 
-    server = HTTPServer(("127.0.0.1", PRINT_SERVER_PORT), PrintHandler)
+    server = ThreadingHTTPServer(("127.0.0.1", PRINT_SERVER_PORT), PrintHandler)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
